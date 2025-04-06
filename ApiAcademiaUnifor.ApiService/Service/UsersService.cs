@@ -16,11 +16,22 @@ namespace ApiAcademiaUnifor.ApiService.Service
             _supabase = supabase;
         }
 
+        public async Task<bool> authenticate(AuthenticateDto authenticateDto)
+        {
+            var user  = await _supabase.From<Users>()
+                .Where(x => x.Email == authenticateDto.email && x.Password == authenticateDto.passWord)
+                .Single();
+
+            if (user is not null)
+                return true;
+
+            return false;
+        }
+
         public async Task<List<UserDto>> GetAll()
         {
             try
             {
-
                 var usuariosResponse = await _supabase.From<Users>().Get();
 
                 var usuarios = usuariosResponse.Models.Select(u => new UserDto
@@ -32,7 +43,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Address = u.Address,
                     BirthDate = u.BirthDate,
                     AvatarUrl = u.AvatarUrl,
-                    IsAdmin = u.IsAdmin
+                    IsAdmin = u.IsAdmin,
+                    Password = u.Password
                 }).ToList();
 
 
@@ -85,7 +97,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Address = usuariosResponse.Models.FirstOrDefault().Address,
                     BirthDate = usuariosResponse.Models.FirstOrDefault().BirthDate,
                     AvatarUrl = usuariosResponse.Models.FirstOrDefault().AvatarUrl,
-                    IsAdmin = usuariosResponse.Models.FirstOrDefault().IsAdmin
+                    IsAdmin = usuariosResponse.Models.FirstOrDefault().IsAdmin,
+                    Password = usuariosResponse.Models.FirstOrDefault().Password
                 };
 
 
