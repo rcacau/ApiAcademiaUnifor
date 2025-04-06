@@ -8,7 +8,25 @@ namespace ApiAcademiaUnifor.ApiService.Controller
     [Route("api/[controller]")]
     public class UsersController(UsersService _usersService) : ControllerBase
     {
-        
+        [HttpPost("authenticate")]
+        public async Task<IActionResult> Authenticate([FromBody] AuthenticateDto authenticateDto)
+        {
+            try
+            {
+                var retorno = await _usersService.authenticate(authenticateDto);
+
+                if (retorno)
+                    return Ok(new { message = "Autenticado com sucesso!" });
+
+                return Unauthorized(new { message = "Falha na autenticação!" });
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -46,7 +64,7 @@ namespace ApiAcademiaUnifor.ApiService.Controller
                 var retorno = await _usersService.Put(userInsertDto, id);
                 return Ok(retorno);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
