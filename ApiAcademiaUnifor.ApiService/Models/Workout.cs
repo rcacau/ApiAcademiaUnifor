@@ -1,6 +1,7 @@
 ﻿using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
 
+
 namespace ApiAcademiaUnifor.ApiService.Models
 {
     [Table("workouts")]
@@ -18,5 +19,6 @@ namespace ApiAcademiaUnifor.ApiService.Models
 
         [Column("description")]
         public string? Description { get; set; }
+
     }
 }

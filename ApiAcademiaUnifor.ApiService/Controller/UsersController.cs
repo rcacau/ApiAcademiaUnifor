@@ -83,5 +83,19 @@ namespace ApiAcademiaUnifor.ApiService.Controller
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("complete")]
+        public async Task<IActionResult> getWE()
+        {
+            try
+            {
+                var retorno = await _usersService.GetWE();
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

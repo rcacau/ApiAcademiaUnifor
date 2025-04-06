@@ -4,16 +4,15 @@ using Supabase;
 using Microsoft.AspNetCore.Mvc;
 using Supabase.Gotrue;
 using Supabase.Interfaces;
+using ApiAcademiaUnifor.ApiService.Service.Base;
+using System.Text.Json;
 
 namespace ApiAcademiaUnifor.ApiService.Service
 {
-    public class UsersService
+    public class UsersService : ServiceBase
     {
-        private readonly Supabase.Client _supabase;
-
-        public UsersService(Supabase.Client supabase)
+        public UsersService(Supabase.Client supabase) : base(supabase)
         {
-            _supabase = supabase;
         }
 
         public async Task<bool> authenticate(AuthenticateDto authenticateDto)
@@ -182,6 +181,63 @@ namespace ApiAcademiaUnifor.ApiService.Service
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+
+        public async Task<List<UserCompDto>> GetWE()
+        {
+            try
+            {
+                var usuarios = await _supabase.From<Users>().Get();
+                var treinos = await _supabase.From<Workout>().Get();
+                var exercicios = await _supabase.From<Exercise>().Get();
+
+                var userDtos = usuarios.Models.Select(user =>
+                {
+                    var workoutDtos = treinos.Models
+                        .Where(w => w.UserId == user.Id)
+                        .Select(w =>
+                        {
+                            var exerciseDtos = exercicios.Models
+                                .Where(e => e.WorkoutId == w.Id)
+                                .Select(e => new ExerciseDto
+                                {
+                                    Name = e.Name,
+                                    Reps = e.Reps,
+                                    Notes = e.Notes
+                                })
+                                .ToList();
+
+                            return new WorkoutDto
+                            {
+                                Name = w.Name,
+                                Description = w.Description,
+                                Exercises = exerciseDtos
+                            };
+                        })
+                        .ToList();
+
+                    return new UserCompDto
+                    {
+                        Id = user.Id,
+                        Name = user.Name,
+                        Email = user.Email,
+                        Password = user.Password,
+                        Phone = user.Phone,
+                        Address = user.Address,
+                        BirthDate = user.BirthDate,
+                        AvatarUrl = user.AvatarUrl,
+                        IsAdmin = user.IsAdmin,
+                        Workouts = workoutDtos
+                    };
+                }).ToList();
+
+                return userDtos;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao carregar usuários com treinos: {ex.Message}");
             }
         }
 

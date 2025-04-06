@@ -25,13 +25,13 @@ namespace ApiAcademiaUnifor.ApiService.Models
         [Column("address")]
         public string? Address { get; set; }
 
-        [Column("birth_date")]
+        [Column("birthDate")]
         public string? BirthDate { get; set; }
 
-        [Column("avatar_url")]
+        [Column("avatarUrl")]
         public string? AvatarUrl { get; set; }
 
-        [Column("is_admin")]
+        [Column("is_dmin")]
         public bool IsAdmin { get; set; } = false;
     }
 }
