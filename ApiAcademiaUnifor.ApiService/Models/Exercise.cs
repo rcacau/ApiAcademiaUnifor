@@ -18,5 +18,8 @@ namespace ApiAcademiaUnifor.ApiService.Models
 
         [Column("notes")]
         public string? Notes { get; set; }
+
+        [Column("workout_id")]
+        public int WorkoutId { get; set; }
     }
 }
