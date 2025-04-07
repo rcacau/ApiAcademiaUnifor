@@ -9,15 +9,15 @@ using System.Text.Json;
 
 namespace ApiAcademiaUnifor.ApiService.Service
 {
-    public class UsersService : ServiceBase
+    public class UserService : ServiceBase
     {
-        public UsersService(Supabase.Client supabase) : base(supabase)
+        public UserService(Supabase.Client supabase) : base(supabase)
         {
         }
 
         public async Task<bool> authenticate(AuthenticateDto authenticateDto)
         {
-            var user  = await _supabase.From<Users>()
+            var user  = await _supabase.From<Models.User>()
                 .Where(x => x.Email == authenticateDto.email && x.Password == authenticateDto.passWord)
                 .Single();
 
@@ -31,7 +31,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
         {
             try
             {
-                var usuariosResponse = await _supabase.From<Users>().Get();
+                var usuariosResponse = await _supabase.From<Models.User>().Get();
 
                 var usuarios = usuariosResponse.Models.Select(u => new UserDto
                 {
@@ -59,7 +59,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
         {
             try
             {
-                var lista = await _supabase.From<Users>().Get();
+                var lista = await _supabase.From<Models.User>().Get();
 
                 int id = 0;
 
@@ -71,7 +71,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     }
                 }
 
-                var user = new Users
+                var user = new Models.User
                 {
                     Id = id + 1,
                     Password = userInsertDto.Password,
@@ -84,7 +84,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     IsAdmin = userInsertDto.IsAdmin
                 };
 
-                var usuariosResponse = await _supabase.From<Users>().Insert(user);
+                var usuariosResponse = await _supabase.From<Models.User>().Insert(user);
 
 
 
@@ -114,7 +114,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
             try
             {
                 
-                var userResponse = await _supabase.From<Users>().Where(x => x.Id == id).Single();
+                var userResponse = await _supabase.From<Models.User>().Where(x => x.Id == id).Single();
 
                 if (userResponse == null)
                     throw new Exception("Usuário não encontrado.");
@@ -129,7 +129,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 userResponse.IsAdmin = userInsertDto.IsAdmin;
 
 
-                var user = await userResponse.Update<Users>();
+                var user = await userResponse.Update<Models.User>();
                 
                 var usuario = new UserDto
                 {
@@ -156,12 +156,12 @@ namespace ApiAcademiaUnifor.ApiService.Service
         {
             try
             {
-                var userResponse = await _supabase.From<Users>().Where(x => x.Id == id).Single();
+                var userResponse = await _supabase.From<Models.User>().Where(x => x.Id == id).Single();
 
                 if (userResponse == null)
                     throw new Exception("Usuário não encontrado.");
 
-                await _supabase.From<Users>().Where(x => x.Id == id).Delete();
+                await _supabase.From<Models.User>().Where(x => x.Id == id).Delete();
 
                 var usuario = new UserDto
                 {
@@ -184,12 +184,11 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
-
-        public async Task<List<UserCompDto>> GetWE()
+        public async Task<List<UserCompletoDto>> GetWorkoutExercise()
         {
             try
             {
-                var usuarios = await _supabase.From<Users>().Get();
+                var usuarios = await _supabase.From<Models.User>().Get();
                 var treinos = await _supabase.From<Workout>().Get();
                 var exercicios = await _supabase.From<Exercise>().Get();
 
@@ -218,7 +217,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                         })
                         .ToList();
 
-                    return new UserCompDto
+                    return new UserCompletoDto
                     {
                         Id = user.Id,
                         Name = user.Name,

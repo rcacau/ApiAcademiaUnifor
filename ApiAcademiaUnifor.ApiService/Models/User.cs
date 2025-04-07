@@ -4,7 +4,7 @@ using Supabase.Postgrest.Models;
 namespace ApiAcademiaUnifor.ApiService.Models
 {
     [Table("users")]
-    public class Users : BaseModel
+    public class User : BaseModel
     {
         [PrimaryKey("id")]
         [Column("id")]
