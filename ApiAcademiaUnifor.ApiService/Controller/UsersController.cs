@@ -6,7 +6,7 @@ namespace ApiAcademiaUnifor.ApiService.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController(UsersService _usersService) : ControllerBase
+    public class UsersController(UserService _usersService) : ControllerBase
     {
         [HttpPost("authenticate")]
         public async Task<IActionResult> Authenticate([FromBody] AuthenticateDto authenticateDto)
@@ -89,7 +89,7 @@ namespace ApiAcademiaUnifor.ApiService.Controller
         {
             try
             {
-                var retorno = await _usersService.GetWE();
+                var retorno = await _usersService.GetWorkoutExercise();
                 return Ok(retorno);
             }
             catch (Exception ex)

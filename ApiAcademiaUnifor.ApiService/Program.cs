@@ -19,7 +19,7 @@ var supabaseOptions = new Supabase.SupabaseOptions
 var supabaseClient = new Supabase.Client(supabaseUrl, supabaseKey, supabaseOptions);
 await supabaseClient.InitializeAsync();
 
-builder.Services.AddScoped<UsersService>();
+builder.Services.AddScoped<UserService>();
 
 builder.Services.AddSingleton(supabaseClient);
 

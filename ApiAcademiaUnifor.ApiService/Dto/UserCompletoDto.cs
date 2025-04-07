@@ -1,6 +1,6 @@
 ﻿namespace ApiAcademiaUnifor.ApiService.Dto
 {
-    public class UserCompDto
+    public class UserCompletoDto
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
