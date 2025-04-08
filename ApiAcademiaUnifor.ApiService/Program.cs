@@ -20,6 +20,7 @@ var supabaseClient = new Supabase.Client(supabaseUrl, supabaseKey, supabaseOptio
 await supabaseClient.InitializeAsync();
 
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<GymEquipmentService>();
 
 builder.Services.AddSingleton(supabaseClient);
 

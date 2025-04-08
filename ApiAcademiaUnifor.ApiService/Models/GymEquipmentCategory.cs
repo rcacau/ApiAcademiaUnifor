@@ -11,9 +11,10 @@ namespace ApiAcademiaUnifor.ApiService.Models
         public int Id { get; set; }
 
         [Column("category_name")]
-        public string CategoryName { get; set; } = string.Empty;
+        public string category_name { get; set; } = string.Empty;
 
         [Column("total")]
         public int Total { get; set; }
+        
     }
 }
