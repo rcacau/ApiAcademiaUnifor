@@ -22,6 +22,20 @@ namespace ApiAcademiaUnifor.ApiService.Controller
             }
         }
 
+        [HttpGet("equipment/{id}")]
+        public async Task<IActionResult> GetEquipmentById(int id)
+        {
+            try
+            {
+                var retorno = await _gymEquipmentService.GetEquipmentById(id);
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
         [HttpGet("category")]
         public async Task<IActionResult> GetAllCategorys()
         {
@@ -84,6 +98,48 @@ namespace ApiAcademiaUnifor.ApiService.Controller
             try
             {
                 var retorno = await _gymEquipmentService.PostCategory(gymEquipmentCategoryInsertDto);
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpPut("equipment/{id}")]
+        public async Task<IActionResult> PutEquipment(GymEquipmentInsertDto gymEquipmentInsertDto, int id)
+        {
+            try
+            {
+                var retorno = await _gymEquipmentService.PutEquipment(gymEquipmentInsertDto, id);
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpPut("category/{id}")]
+        public async Task<IActionResult> PutCategory(GymEquipmentCategoryInsertDto gymEquipmentCategoryInsertDto, int id)
+        {
+            try
+            {
+                var retorno = await _gymEquipmentService.PutCategory(gymEquipmentCategoryInsertDto, id);
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpDelete("equipment/{id}")]
+        public async Task<IActionResult> DeleteEquipment(int id)
+        {
+            try
+            {
+                var retorno = await _gymEquipmentService.DeleteEquipment(id);
                 return Ok(retorno);
             }
             catch (Exception ex)
