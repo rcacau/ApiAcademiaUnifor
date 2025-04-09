@@ -1,11 +1,6 @@
 ﻿using ApiAcademiaUnifor.ApiService.Dto;
 using ApiAcademiaUnifor.ApiService.Models;
-using Supabase;
-using Microsoft.AspNetCore.Mvc;
-using Supabase.Gotrue;
-using Supabase.Interfaces;
 using ApiAcademiaUnifor.ApiService.Service.Base;
-using System.Text.Json;
 
 namespace ApiAcademiaUnifor.ApiService.Service
 {
@@ -17,14 +12,11 @@ namespace ApiAcademiaUnifor.ApiService.Service
 
         public async Task<bool> authenticate(AuthenticateDto authenticateDto)
         {
-            var user  = await _supabase.From<Models.User>()
+            var user = await _supabase.From<Models.User>()
                 .Where(x => x.Email == authenticateDto.email && x.Password == authenticateDto.passWord)
                 .Single();
 
-            if (user is not null)
-                return true;
-
-            return false;
+            return user is not null;
         }
 
         public async Task<List<UserDto>> GetAll()
@@ -46,7 +38,6 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Password = u.Password
                 }).ToList();
 
-
                 return usuarios;
             }
             catch (Exception ex)
@@ -60,16 +51,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
             try
             {
                 var lista = await _supabase.From<Models.User>().Get();
-
-                int id = 0;
-
-                foreach (var item in lista.Models)
-                {
-                    if (item.Id > id)
-                    {
-                        id = item.Id;
-                    }
-                }
+                int id = lista.Models.Any() ? lista.Models.Max(e => e.Id) : 0;
 
                 var user = new Models.User
                 {
@@ -86,22 +68,23 @@ namespace ApiAcademiaUnifor.ApiService.Service
 
                 var usuariosResponse = await _supabase.From<Models.User>().Insert(user);
 
+                var insertedUser = usuariosResponse.Models.FirstOrDefault();
 
+                if (insertedUser == null)
+                    throw new Exception("Erro ao inserir usuário.");
 
-                var usuario = new UserDto{
-                    Id = usuariosResponse.Models.FirstOrDefault().Id,
-                    Name = usuariosResponse.Models.FirstOrDefault().Name,
-                    Email = usuariosResponse.Models.FirstOrDefault().Email,
-                    Phone = usuariosResponse.Models.FirstOrDefault().Phone,
-                    Address = usuariosResponse.Models.FirstOrDefault().Address,
-                    BirthDate = usuariosResponse.Models.FirstOrDefault().BirthDate,
-                    AvatarUrl = usuariosResponse.Models.FirstOrDefault().AvatarUrl,
-                    IsAdmin = usuariosResponse.Models.FirstOrDefault().IsAdmin,
-                    Password = usuariosResponse.Models.FirstOrDefault().Password
+                return new UserDto
+                {
+                    Id = insertedUser.Id,
+                    Name = insertedUser.Name,
+                    Email = insertedUser.Email,
+                    Phone = insertedUser.Phone,
+                    Address = insertedUser.Address,
+                    BirthDate = insertedUser.BirthDate,
+                    AvatarUrl = insertedUser.AvatarUrl,
+                    IsAdmin = insertedUser.IsAdmin,
+                    Password = insertedUser.Password
                 };
-
-
-                return usuario;
             }
             catch (Exception ex)
             {
@@ -113,7 +96,6 @@ namespace ApiAcademiaUnifor.ApiService.Service
         {
             try
             {
-                
                 var userResponse = await _supabase.From<Models.User>().Where(x => x.Id == id).Single();
 
                 if (userResponse == null)
@@ -128,23 +110,25 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 userResponse.AvatarUrl = userInsertDto.AvatarUrl;
                 userResponse.IsAdmin = userInsertDto.IsAdmin;
 
-
                 var user = await userResponse.Update<Models.User>();
-                
-                var usuario = new UserDto
-                {
-                    Id = user.Models.FirstOrDefault().Id,
-                    Name = user.Models.FirstOrDefault().Name,
-                    Email = user.Models.FirstOrDefault().Email,
-                    Phone = user.Models.FirstOrDefault().Phone,
-                    Password = user.Models.FirstOrDefault().Password,
-                    Address = user.Models.FirstOrDefault().Address,
-                    BirthDate = user.Models.FirstOrDefault().BirthDate,
-                    AvatarUrl = user.Models.FirstOrDefault().AvatarUrl,
-                    IsAdmin = user.Models.FirstOrDefault().IsAdmin
-                };
 
-                return usuario;
+                var updatedUser = user.Models.FirstOrDefault();
+
+                if (updatedUser == null)
+                    throw new Exception("Erro ao atualizar usuário.");
+
+                return new UserDto
+                {
+                    Id = updatedUser.Id,
+                    Name = updatedUser.Name,
+                    Email = updatedUser.Email,
+                    Phone = updatedUser.Phone,
+                    Password = updatedUser.Password,
+                    Address = updatedUser.Address,
+                    BirthDate = updatedUser.BirthDate,
+                    AvatarUrl = updatedUser.AvatarUrl,
+                    IsAdmin = updatedUser.IsAdmin
+                };
             }
             catch (Exception ex)
             {
@@ -163,7 +147,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
 
                 await _supabase.From<Models.User>().Where(x => x.Id == id).Delete();
 
-                var usuario = new UserDto
+                return new UserDto
                 {
                     Id = userResponse.Id,
                     Name = userResponse.Name,
@@ -175,8 +159,6 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     AvatarUrl = userResponse.AvatarUrl,
                     IsAdmin = userResponse.IsAdmin
                 };
-
-                return usuario;
             }
             catch (Exception ex)
             {
@@ -239,8 +221,5 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 throw new Exception($"Erro ao carregar usuários com treinos: {ex.Message}");
             }
         }
-
-
-
     }
 }

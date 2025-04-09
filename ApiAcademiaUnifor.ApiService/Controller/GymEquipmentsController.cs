@@ -91,5 +91,19 @@ namespace ApiAcademiaUnifor.ApiService.Controller
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+        [HttpDelete("category/{id}")]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            try
+            {
+                var retorno = await _gymEquipmentService.DeleteCategory(id);
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
     }
 }
