@@ -79,11 +79,11 @@ namespace ApiAcademiaUnifor.ApiService.Controller
         }
 
         [HttpPost("equipment")]
-        public async Task<IActionResult> PostEquipment(GymEquipmentInsertDto gymEquipmentInsertDto)
+        public async Task<IActionResult> PostEquipment(GymEquipmentDto gymEquipmentDto)
         {
             try
             {
-                var retorno = await _gymEquipmentService.PostEquipment(gymEquipmentInsertDto);
+                var retorno = await _gymEquipmentService.PostEquipment(gymEquipmentDto);
                 return Ok(retorno);
             }
             catch (Exception ex)
@@ -107,11 +107,11 @@ namespace ApiAcademiaUnifor.ApiService.Controller
         }
 
         [HttpPut("equipment/{id}")]
-        public async Task<IActionResult> PutEquipment(GymEquipmentInsertDto gymEquipmentInsertDto, int id)
+        public async Task<IActionResult> PutEquipment(GymEquipmentDto gymEquipmentDto, int id)
         {
             try
             {
-                var retorno = await _gymEquipmentService.PutEquipment(gymEquipmentInsertDto, id);
+                var retorno = await _gymEquipmentService.PutEquipment(gymEquipmentDto, id);
                 return Ok(retorno);
             }
             catch (Exception ex)

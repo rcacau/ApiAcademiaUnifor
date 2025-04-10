@@ -1,4 +1,5 @@
 using ApiAcademiaUnifor.ApiService.Service;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,13 @@ var supabaseOptions = new Supabase.SupabaseOptions
 
 var supabaseClient = new Supabase.Client(supabaseUrl, supabaseKey, supabaseOptions);
 await supabaseClient.InitializeAsync();
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+});
+
+
 
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<GymEquipmentService>();
