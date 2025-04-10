@@ -20,9 +20,9 @@ namespace ApiAcademiaUnifor.ApiService.Service
             try
             {
                 var result = await _supabase
-                .From<GymEquipment>()
-                .Select("*")
-                .Get();
+                    .From<GymEquipment>()
+                    .Select("*")
+                    .Get();
 
                 var dtoList = result.Models.Select(e => new GymEquipmentDto
                 {
@@ -32,17 +32,19 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Brand = e.Brand,
                     Model = e.Model,
                     Quantity = e.Quantity,
-                    Image = e.Image
+                    Image = e.Image,
+                    Operational = e.Operational == false ? false : null
+
                 }).ToList();
 
                 return dtoList;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception($"Erro ao carregar os equipamentos: {ex.Message}");
             }
-            
         }
+
 
         public async Task<GymEquipmentDto> GetEquipmentById(int id)
         {
@@ -66,7 +68,9 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Brand = equipmentId.Brand,
                     Model = equipmentId.Model,
                     Quantity = equipmentId.Quantity,
-                    Image = equipmentId.Image
+                    Image = equipmentId.Image,
+                    Operational = equipmentId.Operational == false ? false : null
+
                 };
 
                 return dtoList;
@@ -124,7 +128,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                             Model = e.Model,
                             Quantity = e.Quantity,
                             Image = e.Image,
-                            
+                            Operational = e.Operational == false ? false : null
+
                         })
                         .ToList();
 
@@ -171,6 +176,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                         Model = e.Model,
                         Quantity = e.Quantity,
                         Image = e.Image,
+                        Operational = e.Operational == false ? false : null
                     })
                     .ToList();
 
@@ -191,12 +197,12 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
-        public async Task<GymEquipmentDto> PostEquipment(GymEquipmentInsertDto gymEquipmentInsertDto)
+        public async Task<GymEquipmentDto> PostEquipment(GymEquipmentDto gymEquipmentDto)
         {
             try
             {
                 var categoriesResponse = await _supabase.From<Models.GymEquipmentCategory>().Get();
-                var category = categoriesResponse.Models.FirstOrDefault(c => c.Id == gymEquipmentInsertDto.CategoryId);
+                var category = categoriesResponse.Models.FirstOrDefault(c => c.Id == gymEquipmentDto.CategoryId);
 
                 if (category == null)
                     throw new Exception("Categoria informada não existe.");
@@ -208,12 +214,15 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 var gymEquipment = new GymEquipment
                 {
                     Id = id + 1,
-                    CategoryId = gymEquipmentInsertDto.CategoryId,
-                    Name = gymEquipmentInsertDto.Name,
-                    Brand = gymEquipmentInsertDto.Brand,
-                    Model = gymEquipmentInsertDto.Model,
-                    Quantity = gymEquipmentInsertDto.Quantity,
-                    Image = gymEquipmentInsertDto.Image,
+                    CategoryId = gymEquipmentDto.CategoryId,
+                    Name = gymEquipmentDto.Name,
+                    Brand = gymEquipmentDto.Brand,
+                    Model = gymEquipmentDto.Model,
+                    Quantity = gymEquipmentDto.Quantity,
+                    Image = gymEquipmentDto.Image,
+                    Operational = gymEquipmentDto.Operational == false ? false : null
+
+
                 };
 
                 var equipmentResponse = await _supabase.From<Models.GymEquipment>().Insert(gymEquipment);
@@ -234,7 +243,9 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Brand = result.Brand,
                     Model = result.Model,
                     Quantity = result.Quantity,
-                    Image = result.Image
+                    Image = result.Image,
+                    Operational = result.Operational == false ? false : null
+
                 };
             }
             catch (Exception ex)
@@ -282,7 +293,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
-        public async Task<GymEquipmentDto> PutEquipment(GymEquipmentInsertDto gymEquipmentInsertDto, int id)
+        public async Task<GymEquipmentDto> PutEquipment(GymEquipmentDto gymEquipmentDto, int id)
         {
             try
             {
@@ -302,12 +313,14 @@ namespace ApiAcademiaUnifor.ApiService.Service
 
                 await _supabase.From<Models.GymEquipmentCategory>().Update(category_old);
 
-                equipmentResponse.CategoryId = gymEquipmentInsertDto.CategoryId;
-                equipmentResponse.Name = gymEquipmentInsertDto.Name;
-                equipmentResponse.Brand = gymEquipmentInsertDto.Brand;
-                equipmentResponse.Model = gymEquipmentInsertDto.Model;
-                equipmentResponse.Quantity = gymEquipmentInsertDto.Quantity;
-                equipmentResponse.Image = gymEquipmentInsertDto.Image;
+                equipmentResponse.CategoryId = gymEquipmentDto.CategoryId;
+                equipmentResponse.Name = gymEquipmentDto.Name;
+                equipmentResponse.Brand = gymEquipmentDto.Brand;
+                equipmentResponse.Model = gymEquipmentDto.Model;
+                equipmentResponse.Quantity = gymEquipmentDto.Quantity;
+                equipmentResponse.Image = gymEquipmentDto.Image;
+                equipmentResponse.Operational = gymEquipmentDto.Operational == false ? false : null;
+
 
 
 
@@ -333,7 +346,9 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Brand = result.Brand,
                     Model = result.Model,
                     Quantity = result.Quantity,
-                    Image = result.Image
+                    Image = result.Image,
+                    Operational = result.Operational == false ? false : null
+
                 };
             }
             catch (Exception ex)

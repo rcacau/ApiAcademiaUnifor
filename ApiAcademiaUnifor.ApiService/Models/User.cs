@@ -32,6 +32,6 @@ namespace ApiAcademiaUnifor.ApiService.Models
         public string? AvatarUrl { get; set; }
 
         [Column("is_admin")]
-        public bool IsAdmin { get; set; } = false;
+        public bool? IsAdmin { get; set; } = false;
     }
 }

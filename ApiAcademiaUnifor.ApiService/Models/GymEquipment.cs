@@ -1,5 +1,6 @@
 ﻿using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.Models;
+using System.Text.Json.Serialization;
 
 namespace ApiAcademiaUnifor.ApiService.Models
 {
@@ -27,5 +28,10 @@ namespace ApiAcademiaUnifor.ApiService.Models
 
         [Column("image")]
         public string? Image { get; set; }
+
+        [Column("operational")]
+        public bool? Operational { get; set; } = true;
+
+
     }
 }

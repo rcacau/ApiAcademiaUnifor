@@ -1,4 +1,6 @@
-﻿namespace ApiAcademiaUnifor.ApiService.Dto
+﻿using System.Text.Json.Serialization;
+
+namespace ApiAcademiaUnifor.ApiService.Dto
 {
     public class UserDto
     {
@@ -10,7 +12,9 @@
         public string? Address { get; set; }
         public string? BirthDate { get; set; }
         public string? AvatarUrl { get; set; }
-        public bool IsAdmin { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool? IsAdmin { get; set; } = null;
     }
 
 }

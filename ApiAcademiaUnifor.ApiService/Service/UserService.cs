@@ -34,7 +34,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Address = u.Address,
                     BirthDate = u.BirthDate,
                     AvatarUrl = u.AvatarUrl,
-                    IsAdmin = u.IsAdmin,
+                    IsAdmin = u.IsAdmin == true ? true : null,
                     Password = u.Password
                 }).ToList();
 
@@ -65,7 +65,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Address = userDto.Address,
                     BirthDate = userDto.BirthDate,
                     AvatarUrl = userDto.AvatarUrl,
-                    IsAdmin = userDto.IsAdmin
+                    IsAdmin = userDto.IsAdmin == true ? true : null
                 };
 
                 var usuariosResponse = await _supabase.From<Models.User>().Insert(user);
@@ -84,7 +84,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Address = insertedUser.Address,
                     BirthDate = insertedUser.BirthDate,
                     AvatarUrl = insertedUser.AvatarUrl,
-                    IsAdmin = insertedUser.IsAdmin,
+                    IsAdmin = insertedUser.IsAdmin == true ? true : null,
                     Password = insertedUser.Password
                 };
             }
@@ -110,7 +110,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 userResponse.Address = userDto.Address;
                 userResponse.BirthDate = userDto.BirthDate;
                 userResponse.AvatarUrl = userDto.AvatarUrl;
-                userResponse.IsAdmin = userDto.IsAdmin;
+                userResponse.IsAdmin = userDto.IsAdmin == true ? true : null;
 
                 var user = await userResponse.Update<Models.User>();
 
@@ -129,7 +129,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Address = updatedUser.Address,
                     BirthDate = updatedUser.BirthDate,
                     AvatarUrl = updatedUser.AvatarUrl,
-                    IsAdmin = updatedUser.IsAdmin
+                    IsAdmin = updatedUser.IsAdmin == true ? true : null
                 };
             }
             catch (Exception ex)
@@ -159,7 +159,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Address = userResponse.Address,
                     BirthDate = userResponse.BirthDate,
                     AvatarUrl = userResponse.AvatarUrl,
-                    IsAdmin = userResponse.IsAdmin
+                    IsAdmin = userResponse.IsAdmin == true ? true : null
                 };
             }
             catch (Exception ex)
@@ -212,7 +212,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                         Address = user.Address,
                         BirthDate = user.BirthDate,
                         AvatarUrl = user.AvatarUrl,
-                        IsAdmin = user.IsAdmin,
+                        IsAdmin = user.IsAdmin == true ? true : null,
                         Workouts = workoutDtos
                     };
                 }).ToList();
