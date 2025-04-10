@@ -6,7 +6,7 @@ namespace ApiAcademiaUnifor.ApiService.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class GymEquipmentsController(GymEquipmentService _gymEquipmentService) : ControllerBase
+    public class GymEquipmentController(GymEquipmentService _gymEquipmentService) : ControllerBase
     {
         [HttpGet("equipment")]
         public async Task<IActionResult> GetAllEquipments()

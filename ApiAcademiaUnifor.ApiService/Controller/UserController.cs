@@ -6,7 +6,7 @@ namespace ApiAcademiaUnifor.ApiService.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController(UserService _usersService) : ControllerBase
+    public class UserController(UserService _usersService) : ControllerBase
     {
         [HttpPost("authenticate")]
         public async Task<IActionResult> Authenticate([FromBody] AuthenticateDto authenticateDto)
@@ -43,11 +43,11 @@ namespace ApiAcademiaUnifor.ApiService.Controller
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] UserInsertDto userInsertDto)
+        public async Task<IActionResult> Post([FromBody] UserDto userDto)
         {
             try
             {
-                var retorno = await _usersService.Post(userInsertDto);
+                var retorno = await _usersService.Post(userDto);
                 return Ok(retorno);
             }
             catch (Exception ex)
@@ -57,11 +57,11 @@ namespace ApiAcademiaUnifor.ApiService.Controller
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] UserInsertDto userInsertDto)
+        public async Task<IActionResult> Put(int id, [FromBody] UserDto userDto)
         {
             try
             {
-                var retorno = await _usersService.Put(userInsertDto, id);
+                var retorno = await _usersService.Put(userDto, id);
                 return Ok(retorno);
             }
             catch (Exception ex)
