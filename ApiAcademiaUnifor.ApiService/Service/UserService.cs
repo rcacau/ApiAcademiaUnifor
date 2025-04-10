@@ -46,24 +46,26 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
-        public async Task<UserDto> Post(UserInsertDto userInsertDto)
+        public async Task<UserDto> Post(UserDto userDto)
         {
             try
             {
+                userDto.Id = 0; 
+
                 var lista = await _supabase.From<Models.User>().Get();
                 int id = lista.Models.Any() ? lista.Models.Max(e => e.Id) : 0;
 
                 var user = new Models.User
                 {
                     Id = id + 1,
-                    Password = userInsertDto.Password,
-                    Name = userInsertDto.Name,
-                    Email = userInsertDto.Email,
-                    Phone = userInsertDto.Phone,
-                    Address = userInsertDto.Address,
-                    BirthDate = userInsertDto.BirthDate,
-                    AvatarUrl = userInsertDto.AvatarUrl,
-                    IsAdmin = userInsertDto.IsAdmin
+                    Password = userDto.Password,
+                    Name = userDto.Name,
+                    Email = userDto.Email,
+                    Phone = userDto.Phone,
+                    Address = userDto.Address,
+                    BirthDate = userDto.BirthDate,
+                    AvatarUrl = userDto.AvatarUrl,
+                    IsAdmin = userDto.IsAdmin
                 };
 
                 var usuariosResponse = await _supabase.From<Models.User>().Insert(user);
@@ -92,7 +94,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
-        public async Task<UserDto> Put(UserInsertDto userInsertDto, int id)
+        public async Task<UserDto> Put(UserDto userDto, int id)
         {
             try
             {
@@ -101,14 +103,14 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 if (userResponse == null)
                     throw new Exception("Usuário não encontrado.");
 
-                userResponse.Name = userInsertDto.Name;
-                userResponse.Email = userInsertDto.Email;
-                userResponse.Password = userInsertDto.Password;
-                userResponse.Phone = userInsertDto.Phone;
-                userResponse.Address = userInsertDto.Address;
-                userResponse.BirthDate = userInsertDto.BirthDate;
-                userResponse.AvatarUrl = userInsertDto.AvatarUrl;
-                userResponse.IsAdmin = userInsertDto.IsAdmin;
+                userResponse.Name = userDto.Name;
+                userResponse.Email = userDto.Email;
+                userResponse.Password = userDto.Password;
+                userResponse.Phone = userDto.Phone;
+                userResponse.Address = userDto.Address;
+                userResponse.BirthDate = userDto.BirthDate;
+                userResponse.AvatarUrl = userDto.AvatarUrl;
+                userResponse.IsAdmin = userDto.IsAdmin;
 
                 var user = await userResponse.Update<Models.User>();
 
@@ -165,6 +167,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 throw new Exception(ex.Message);
             }
         }
+
 
         public async Task<List<UserCompletoDto>> GetWorkoutExercise()
         {
