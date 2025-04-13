@@ -67,6 +67,33 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
+        //novo; igor, depois vê se precisa essa parte no controller
+        public async Task<List<ExerciseDto>> GetByWorkoutId(int workoutId)
+        {
+            try
+            {
+                var result = await _supabase
+                .From<Exercise>()
+                .Where(e => e.WorkoutId == workoutId)
+                .Get();
+                var exerciseResult = result.Models.ToList();
+                if (exerciseResult == null)
+                    throw new Exception("Equipamento não encontrado");
+                return exerciseResult.Select(e => new ExerciseDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    Reps = e.Reps,
+                    Notes = e.Notes,
+                    WorkoutId = e.WorkoutId
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<ExerciseDto> Post(ExerciseDto exerciseDto)
         {
             try

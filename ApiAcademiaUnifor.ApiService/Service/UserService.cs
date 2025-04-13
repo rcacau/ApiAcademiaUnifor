@@ -6,8 +6,11 @@ namespace ApiAcademiaUnifor.ApiService.Service
 {
     public class UserService : ServiceBase
     {
+
+        private readonly WorkoutService _workoutService;
         public UserService(Supabase.Client supabase) : base(supabase)
         {
+            _workoutService = new WorkoutService(supabase);
         }
 
         public async Task<bool> authenticate(AuthenticateDto authenticateDto)
@@ -168,39 +171,16 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
-
-        public async Task<List<UserCompletoDto>> GetWorkoutExercise()
+        //alterado, ainda nao testei
+        public async Task<List<UserCompletoDto>> GetAllCompleteUsers()
         {
             try
             {
                 var usuarios = await _supabase.From<Models.User>().Get();
-                var treinos = await _supabase.From<Workout>().Get();
-                var exercicios = await _supabase.From<Exercise>().Get();
 
-                var userDtos = usuarios.Models.Select(user =>
+                var tasks = usuarios.Models.Select(async user =>
                 {
-                    var workoutDtos = treinos.Models
-                        .Where(w => w.UserId == user.Id)
-                        .Select(w =>
-                        {
-                            var exerciseDtos = exercicios.Models
-                                .Where(e => e.WorkoutId == w.Id)
-                                .Select(e => new ExerciseDto
-                                {
-                                    Name = e.Name,
-                                    Reps = e.Reps,
-                                    Notes = e.Notes
-                                })
-                                .ToList();
-
-                            return new WorkoutDto
-                            {
-                                Name = w.Name,
-                                Description = w.Description,
-                                Exercises = exerciseDtos
-                            };
-                        })
-                        .ToList();
+                    var workoutDtos = await _workoutService.GetAllByUserId(user.Id);
 
                     return new UserCompletoDto
                     {
@@ -215,14 +195,54 @@ namespace ApiAcademiaUnifor.ApiService.Service
                         IsAdmin = user.IsAdmin == true ? true : null,
                         Workouts = workoutDtos
                     };
-                }).ToList();
+                });
 
-                return userDtos;
+                var userDtos = await Task.WhenAll(tasks);
+
+                return userDtos.ToList();
             }
             catch (Exception ex)
             {
                 throw new Exception($"Erro ao carregar usuários com treinos: {ex.Message}");
             }
         }
+
+        //novo
+        public async Task<UserCompletoDto> GetCompleteUserByUserId(int id)
+        {
+            try
+            {
+                var user = await _supabase.From<Models.User>().Where(x => x.Id == id).Get();
+                var userResponse = user.Models.FirstOrDefault();
+
+                if (userResponse == null)
+                {
+                    throw new Exception("Usuário não encontrado.");
+                }
+
+                var workoutDtos = await _workoutService.GetAllByUserId(userResponse.Id);
+
+                var userCompletoDto = new UserCompletoDto
+                {
+                    Id = userResponse.Id,
+                    Name = userResponse.Name,
+                    Email = userResponse.Email,
+                    Password = userResponse.Password,
+                    Phone = userResponse.Phone,
+                    Address = userResponse.Address,
+                    BirthDate = userResponse.BirthDate,
+                    AvatarUrl = userResponse.AvatarUrl,
+                    IsAdmin = userResponse.IsAdmin == true ? true : null,
+                    Workouts = workoutDtos
+                };
+
+                return userCompletoDto;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao carregar usuários com treinos: {ex.Message}");
+            }
+        }
+
     }
 }

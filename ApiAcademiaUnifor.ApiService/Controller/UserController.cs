@@ -85,11 +85,26 @@ namespace ApiAcademiaUnifor.ApiService.Controller
         }
 
         [HttpGet("complete")]
-        public async Task<IActionResult> getWE()
+        public async Task<IActionResult> GetAllCompleteUsers()
         {
             try
             {
-                var retorno = await _usersService.GetWorkoutExercise();
+                var retorno = await _usersService.GetAllCompleteUsers();
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        
+        //novo 
+        [HttpGet("complete/{id}")]
+        public async Task<IActionResult> GetCompleteUserByUserId(int id)
+        {
+            try
+            {
+                var retorno = await _usersService.GetCompleteUserByUserId(id);
                 return Ok(retorno);
             }
             catch (Exception ex)
