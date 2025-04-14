@@ -49,6 +49,77 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
+        public async Task<List<UserCompletoDto>> GetAllCompleteUsers()
+        {
+            try
+            {
+                var usuarios = await _supabase.From<Models.User>().Get();
+
+                var tasks = usuarios.Models.Select(async user =>
+                {
+                    var workoutDtos = await _workoutService.GetAllWorkoutsByUserId(user.Id);
+
+                    return new UserCompletoDto
+                    {
+                        Id = user.Id,
+                        Name = user.Name,
+                        Email = user.Email,
+                        Password = user.Password,
+                        Phone = user.Phone,
+                        Address = user.Address,
+                        BirthDate = user.BirthDate,
+                        AvatarUrl = user.AvatarUrl,
+                        IsAdmin = user.IsAdmin == true ? true : null,
+                        Workouts = workoutDtos
+                    };
+                });
+
+                var userDtos = await Task.WhenAll(tasks);
+
+                return userDtos.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao carregar usuários com treinos: {ex.Message}");
+            }
+        }
+
+        public async Task<UserCompletoDto> GetCompleteUserByUserId(int id)
+        {
+            try
+            {
+                var user = await _supabase.From<Models.User>().Where(x => x.Id == id).Get();
+                var userResponse = user.Models.FirstOrDefault();
+
+                if (userResponse == null)
+                {
+                    throw new Exception("Usuário não encontrado.");
+                }
+
+                var workoutDtos = await _workoutService.GetAllWorkoutsByUserId(userResponse.Id);
+
+                var userCompletoDto = new UserCompletoDto
+                {
+                    Id = userResponse.Id,
+                    Name = userResponse.Name,
+                    Email = userResponse.Email,
+                    Password = userResponse.Password,
+                    Phone = userResponse.Phone,
+                    Address = userResponse.Address,
+                    BirthDate = userResponse.BirthDate,
+                    AvatarUrl = userResponse.AvatarUrl,
+                    IsAdmin = userResponse.IsAdmin == true ? true : null,
+                    Workouts = workoutDtos
+                };
+
+                return userCompletoDto;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao carregar usuários com treinos: {ex.Message}");
+            }
+        }
+
         public async Task<UserDto> Post(UserDto userDto)
         {
             try
@@ -97,6 +168,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
+
         public async Task<UserDto> Put(UserDto userDto, int id)
         {
             try
@@ -141,7 +213,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
-        public async Task<UserDto?> Delete(int id)
+        public async Task<UserCompletoDto?> Delete(int id)
         {
             try
             {
@@ -150,9 +222,16 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 if (userResponse == null)
                     throw new Exception("Usuário não encontrado.");
 
+                var workoutResponse = await _workoutService.GetAllWorkoutsByUserId(userResponse.Id);
+
                 await _supabase.From<Models.User>().Where(x => x.Id == id).Delete();
 
-                return new UserDto
+                foreach (var workout in workoutResponse)
+                {
+                    await _workoutService.Delete(workout.Id);
+                }
+
+                return new UserCompletoDto
                 {
                     Id = userResponse.Id,
                     Name = userResponse.Name,
@@ -162,7 +241,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Address = userResponse.Address,
                     BirthDate = userResponse.BirthDate,
                     AvatarUrl = userResponse.AvatarUrl,
-                    IsAdmin = userResponse.IsAdmin == true ? true : null
+                    IsAdmin = userResponse.IsAdmin == true ? true : null,
+                    Workouts = workoutResponse
                 };
             }
             catch (Exception ex)
@@ -170,79 +250,5 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 throw new Exception(ex.Message);
             }
         }
-
-        //alterado, ainda nao testei
-        public async Task<List<UserCompletoDto>> GetAllCompleteUsers()
-        {
-            try
-            {
-                var usuarios = await _supabase.From<Models.User>().Get();
-
-                var tasks = usuarios.Models.Select(async user =>
-                {
-                    var workoutDtos = await _workoutService.GetAllByUserId(user.Id);
-
-                    return new UserCompletoDto
-                    {
-                        Id = user.Id,
-                        Name = user.Name,
-                        Email = user.Email,
-                        Password = user.Password,
-                        Phone = user.Phone,
-                        Address = user.Address,
-                        BirthDate = user.BirthDate,
-                        AvatarUrl = user.AvatarUrl,
-                        IsAdmin = user.IsAdmin == true ? true : null,
-                        Workouts = workoutDtos
-                    };
-                });
-
-                var userDtos = await Task.WhenAll(tasks);
-
-                return userDtos.ToList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao carregar usuários com treinos: {ex.Message}");
-            }
-        }
-
-        //novo
-        public async Task<UserCompletoDto> GetCompleteUserByUserId(int id)
-        {
-            try
-            {
-                var user = await _supabase.From<Models.User>().Where(x => x.Id == id).Get();
-                var userResponse = user.Models.FirstOrDefault();
-
-                if (userResponse == null)
-                {
-                    throw new Exception("Usuário não encontrado.");
-                }
-
-                var workoutDtos = await _workoutService.GetAllByUserId(userResponse.Id);
-
-                var userCompletoDto = new UserCompletoDto
-                {
-                    Id = userResponse.Id,
-                    Name = userResponse.Name,
-                    Email = userResponse.Email,
-                    Password = userResponse.Password,
-                    Phone = userResponse.Phone,
-                    Address = userResponse.Address,
-                    BirthDate = userResponse.BirthDate,
-                    AvatarUrl = userResponse.AvatarUrl,
-                    IsAdmin = userResponse.IsAdmin == true ? true : null,
-                    Workouts = workoutDtos
-                };
-
-                return userCompletoDto;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao carregar usuários com treinos: {ex.Message}");
-            }
-        }
-
     }
 }

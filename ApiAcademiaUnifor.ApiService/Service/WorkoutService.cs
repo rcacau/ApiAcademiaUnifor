@@ -44,7 +44,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
-        public async Task<List<WorkoutDto>> GetAllByUserId(int userId)
+        public async Task<List<WorkoutDto>> GetAllWorkoutsByUserId(int userId)
         {
             try
             {
@@ -105,7 +105,6 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
-        //AINDA NAO MEXI DIREITO DAQUI PRA BAIXO DEPOIS A GENTE CONVERSA SOBRE COMO VAI FAZER
         public async Task<WorkoutDto> Post(WorkoutDto workoutDto)
         {
             try
@@ -153,17 +152,38 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<WorkoutDto> Delete(int id)
         {
             try
-            {
+            { 
                 var workout = await _supabase.From<Workout>().Where(x => x.Id == id).Get();
-                if (workout.Models.Count == 0)
+                var workoutResponse = workout.Models.FirstOrDefault();
+                if (workout.Models.Count == 0 || workoutResponse is null)
                 {
                     throw new Exception($"Workout with ID {id} not found.");
                 }
+
                 await _supabase.From<Workout>().Where(x => x.Id == id).Delete();
-                return true;
+
+                var exercises = await _exerciseService.GetByWorkoutId(id);
+
+                foreach (var exercise in exercises)
+                {
+                    await _exerciseService.Delete(exercise.Id);
+                }
+
+                var workoutDto = new WorkoutDto 
+                {
+                    Id = id,
+                    UserId = workoutResponse.UserId,
+                    Name = workoutResponse.Name,
+                    Description = workoutResponse.Description,
+                    Exercises = exercises
+                };
+
+
+
+                return workoutDto;
             }
             catch (Exception ex)
             {
