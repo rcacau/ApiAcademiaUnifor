@@ -98,7 +98,7 @@ namespace ApiAcademiaUnifor.ApiService.Controller
             }
         }
         
-        //novo 
+
         [HttpGet("complete/{id}")]
         public async Task<IActionResult> GetCompleteUserByUserId(int id)
         {

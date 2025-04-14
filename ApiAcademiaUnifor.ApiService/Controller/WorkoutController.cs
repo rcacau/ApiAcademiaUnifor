@@ -28,7 +28,7 @@ namespace ApiAcademiaUnifor.ApiService.Controller
         {
             try
             {
-                var retorno = await _workoutService.GetAllByUserId(id);
+                var retorno = await _workoutService.GetAllWorkoutsByUserId(id);
                 return Ok(retorno);
             }
             catch (Exception ex)
