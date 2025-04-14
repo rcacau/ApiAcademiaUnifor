@@ -1,6 +1,6 @@
 ﻿namespace ApiAcademiaUnifor.ApiService.Dto
 {
-    public class GymEquipmentCategoryInsertDto
+    public class GymEquipmentCategoryCompleteDto
     {
         public string category_name { get; set; } = string.Empty;
         public int Total { get; set; }

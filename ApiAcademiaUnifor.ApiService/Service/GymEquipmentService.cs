@@ -15,7 +15,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
         {
         }
 
-        public async Task<List<GymEquipmentDto>> GetAllEquipments()
+        public async Task<List<GymEquipmentDto>> GetAll()
         {
             try
             {
@@ -46,7 +46,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
         }
 
 
-        public async Task<GymEquipmentDto> GetEquipmentById(int id)
+        public async Task<GymEquipmentDto> GetById(int id)
         {
             try
             {
@@ -82,122 +82,40 @@ namespace ApiAcademiaUnifor.ApiService.Service
 
         }
 
-        public async Task<List<GymEquipmentCategoryDto>> GetAllCategorys()
+        public async Task<List<GymEquipmentDto>> GetByCategoryId(int categoryId)
         {
             try
             {
                 var result = await _supabase
-                .From<GymEquipmentCategory>()
-                .Select("*")
+                .From<GymEquipment>()
+                .Where(e => e.CategoryId == categoryId)
                 .Get();
+                var equipmentResult = result.Models.ToList();
 
-                var dtoList = result.Models.Select(e => new GymEquipmentCategoryDto
+                if (equipmentResult == null)
+                    throw new Exception("Equipamento não encontrado");
+
+                return equipmentResult.Select(e => new GymEquipmentDto
                 {
                     Id = e.Id,
-                    category_name = e.category_name,
-                    Total = e.Total,
-         
+                    CategoryId = e.CategoryId,
+                    Name = e.Name,
+                    Brand = e.Brand,
+                    Model = e.Model,
+                    Quantity = e.Quantity,
+                    Image = e.Image,
+                    Operational = e.Operational == false ? false : null
                 }).ToList();
-
-                return dtoList;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Erro ao carregar só as categorias: {ex.Message}");
-            }
-
-        }
-
-        public async Task<List<GymEquipmentCategoryDto>> GetAllCategoriesWithEquipments()
-        {
-            try
-            {
-                var categorias = await _supabase.From<Models.GymEquipmentCategory>().Get();
-                var equipamentos = await _supabase.From<GymEquipment>().Get();
-
-                var categoriasComEquipamentos = categorias.Models.Select(categoria =>
-                {
-                    var equipamentosDto = equipamentos.Models
-                        .Where(e => e.CategoryId == categoria.Id)
-                        .Select(e => new GymEquipmentDto
-                        {
-                            Id = e.Id,
-                            CategoryId = e.CategoryId,
-                            Name = e.Name,
-                            Brand = e.Brand,
-                            Model = e.Model,
-                            Quantity = e.Quantity,
-                            Image = e.Image,
-                            Operational = e.Operational == false ? false : null
-
-                        })
-                        .ToList();
-
-                    return new GymEquipmentCategoryDto
-                    {
-                        Id = categoria.Id,
-                        category_name = categoria.category_name,
-                        Total = categoria.Total,
-                        Equipments = equipamentosDto
-                    };
-                }).ToList();
-
-                return categoriasComEquipamentos;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao carregar categorias com equipamentos: {ex.Message}");
+                throw new Exception(ex.Message);
             }
         }
 
+       
 
-        public async Task<GymEquipmentCategoryDto> GetCategoryCompleteById(int id)
-        {
-            try
-            {
-                var categorias = await _supabase.From<Models.GymEquipmentCategory>().Get();
-                var equipamentos = await _supabase.From<GymEquipment>().Get();
-
-                
-                var categoria = categorias.Models.FirstOrDefault(c => c.Id == id);
-
-                if (categoria == null)
-                    throw new Exception("Categoria não encontrada");
-
-                
-                var equipamentosDto = equipamentos.Models
-                    .Where(e => e.CategoryId == categoria.Id)
-                    .Select(e => new GymEquipmentDto
-                    {
-                        Id = e.Id,
-                        CategoryId = e.CategoryId,
-                        Name = e.Name,
-                        Brand = e.Brand,
-                        Model = e.Model,
-                        Quantity = e.Quantity,
-                        Image = e.Image,
-                        Operational = e.Operational == false ? false : null
-                    })
-                    .ToList();
-
-                
-                var categoriaCompleta = new GymEquipmentCategoryDto
-                {
-                    Id = categoria.Id,
-                    category_name = categoria.category_name,
-                    Total = categoria.Total,
-                    Equipments = equipamentosDto
-                };
-
-                return categoriaCompleta;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao carregar categoria pelo id: {ex.Message}");
-            }
-        }
-
-        public async Task<GymEquipmentDto> PostEquipment(GymEquipmentDto gymEquipmentDto)
+        public async Task<GymEquipmentDto> Post(GymEquipmentDto gymEquipmentDto)
         {
             try
             {
@@ -255,45 +173,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
         }
 
 
-        public async Task<GymEquipmentCategoryDto> PostCategory(GymEquipmentCategoryInsertDto gymEquipmentCategoryInsertDto)
-        {
-            try
-            {
-                var lista = await _supabase.From<Models.GymEquipmentCategory>().Get();
-
-                int id = lista.Models.Any() ? lista.Models.Max(e => e.Id) : 0;
-
-                var gymEquipmentCategory = new GymEquipmentCategory
-                {
-                    Id = id + 1,
-                    category_name = gymEquipmentCategoryInsertDto.category_name,
-                    Total = gymEquipmentCategoryInsertDto.Total
-                };
-
-                var categoryResponse = await _supabase.From<Models.GymEquipmentCategory>().Insert(gymEquipmentCategory);
-
-                var result = categoryResponse.Models.FirstOrDefault();
-
-                if (result == null)
-                    throw new Exception("Erro ao inserir a categoria");
-
-                var gymCategory = new GymEquipmentCategoryDto
-                {
-                    Id = result.Id,
-                    category_name = result.category_name,
-                    Total = result.Total,
-                };
-
-                return gymCategory;
-
-            }
-            catch(Exception ex)
-            {
-                throw new Exception($"Erro ao inserir categoria: {ex.Message}");
-            }
-        }
-
-        public async Task<GymEquipmentDto> PutEquipment(GymEquipmentDto gymEquipmentDto, int id)
+        public async Task<GymEquipmentDto> Put(GymEquipmentDto gymEquipmentDto, int id)
         {
             try
             {
@@ -357,44 +237,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
-        public async Task<GymEquipmentCategoryDto> PutCategory(GymEquipmentCategoryInsertDto gymEquipmentCategoryInsertDto, int id)
-        {
-            try
-            {
-                var categoryResponse = await _supabase.From<Models.GymEquipmentCategory>().Where(c => c.Id == id).Single();
 
-                if (categoryResponse == null)
-                    throw new Exception("Categoria não encontrada");
-
-
-                categoryResponse.category_name = gymEquipmentCategoryInsertDto.category_name;
-                categoryResponse.Total = gymEquipmentCategoryInsertDto.Total;
-
-
-                var category = await categoryResponse.Update<GymEquipmentCategory>();
-
-                var result = category.Models.FirstOrDefault();
-
-                if (result == null)
-                    throw new Exception("Erro ao inserir a categoria");
-
-                var gymCategory = new GymEquipmentCategoryDto
-                {
-                    Id = result.Id,
-                    category_name = result.category_name,
-                    Total = result.Total,
-                };
-
-                return gymCategory;
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao inserir categoria: {ex.Message}");
-            }
-        }
-
-        public async Task<GymEquipmentDto> DeleteEquipment(int id)
+        public async Task<GymEquipmentDto> Delete(int id)
         {
             try
             {
@@ -412,7 +256,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
 
                 category.Total -= equipmentResponse.Quantity;
 
-                GymEquipmentDto response = await GetEquipmentById(id);
+                GymEquipmentDto response = await GetById(id);
 
                 await _supabase.From<GymEquipment>().Where(x => x.Id == id).Delete();
                 
@@ -426,27 +270,6 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
-        public async Task<GymEquipmentCategoryDto> DeleteCategory(int id)
-        {
-            try
-            {
-                var categoryResponse = await _supabase.From<GymEquipmentCategory>().Where(x => x.Id == id).Single();
-
-                if (categoryResponse == null)
-                    throw new Exception("Usuário não encontrado.");
-
-                GymEquipmentCategoryDto response = await GetCategoryCompleteById(id);
-                await _supabase.From<GymEquipment>().Where(x => x.CategoryId == id).Delete();
-                await _supabase.From<GymEquipmentCategory>().Where(x => x.Id == id).Delete();
-
-                return response;
-                
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
 
     }
 
