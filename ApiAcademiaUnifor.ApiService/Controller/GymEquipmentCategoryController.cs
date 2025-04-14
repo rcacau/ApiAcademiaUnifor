@@ -6,14 +6,14 @@ namespace ApiAcademiaUnifor.ApiService.Controller
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class GymEquipmentController(GymEquipmentService _gymEquipmentService) : ControllerBase
+    public class GymEquipmentCategoryController(GymEquipmentCategoryService _gymEquipmentCategoryService) : ControllerBase
     {
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             try
             {
-                var retorno = await _gymEquipmentService.GetAll();
+                var retorno = await _gymEquipmentCategoryService.GetAll();
                 return Ok(retorno);
             }
             catch (Exception ex)
@@ -27,7 +27,7 @@ namespace ApiAcademiaUnifor.ApiService.Controller
         {
             try
             {
-                var retorno = await _gymEquipmentService.GetById(id);
+                var retorno = await _gymEquipmentCategoryService.GetById(id);
                 return Ok(retorno);
             }
             catch (Exception ex)
@@ -36,13 +36,12 @@ namespace ApiAcademiaUnifor.ApiService.Controller
             }
         }
 
-        
         [HttpPost]
-        public async Task<IActionResult> Post(GymEquipmentDto gymEquipmentDto)
+        public async Task<IActionResult> Post(GymEquipmentCategoryDto gymEquipmentCategoryDto)
         {
             try
             {
-                var retorno = await _gymEquipmentService.Post(gymEquipmentDto);
+                var retorno = await _gymEquipmentCategoryService.Post(gymEquipmentCategoryDto);
                 return Ok(retorno);
             }
             catch (Exception ex)
@@ -50,15 +49,13 @@ namespace ApiAcademiaUnifor.ApiService.Controller
                 return BadRequest(new { error = ex.Message });
             }
         }
-
-        
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(GymEquipmentDto gymEquipmentDto, int id)
+        public async Task<IActionResult> Put(GymEquipmentCategoryDto gymEquipmentCategoryDto, int id)
         {
             try
             {
-                var retorno = await _gymEquipmentService.Put(gymEquipmentDto, id);
+                var retorno = await _gymEquipmentCategoryService.Put(gymEquipmentCategoryDto, id);
                 return Ok(retorno);
             }
             catch (Exception ex)
@@ -66,14 +63,13 @@ namespace ApiAcademiaUnifor.ApiService.Controller
                 return BadRequest(new { error = ex.Message });
             }
         }
-
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                var retorno = await _gymEquipmentService.Delete(id);
+                var retorno = await _gymEquipmentCategoryService.Delete(id);
                 return Ok(retorno);
             }
             catch (Exception ex)
@@ -81,7 +77,5 @@ namespace ApiAcademiaUnifor.ApiService.Controller
                 return BadRequest(new { error = ex.Message });
             }
         }
-
-        
     }
 }
