@@ -23,20 +23,6 @@ namespace ApiAcademiaUnifor.ApiService.Controller
             }
         }
 
-        [HttpGet("userid/{id}")]
-        public async Task<IActionResult> GetAllByUserId(int id)
-        {
-            try
-            {
-                var retorno = await _workoutService.GetAllWorkoutsByUserId(id);
-                return Ok(retorno);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-        }
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -50,6 +36,22 @@ namespace ApiAcademiaUnifor.ApiService.Controller
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+        [HttpGet("userid/{id}")]
+        public async Task<IActionResult> GetByUserId(int id)
+        {
+            try
+            {
+                var retorno = await _workoutService.GetWorkoutsByUserId(id);
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] WorkoutDto workoutDto)
         {
@@ -63,6 +65,7 @@ namespace ApiAcademiaUnifor.ApiService.Controller
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] WorkoutDto workoutDto)
         {
@@ -76,6 +79,7 @@ namespace ApiAcademiaUnifor.ApiService.Controller
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

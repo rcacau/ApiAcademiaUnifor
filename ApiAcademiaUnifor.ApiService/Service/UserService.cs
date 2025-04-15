@@ -57,7 +57,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
 
                 var tasks = usuarios.Models.Select(async user =>
                 {
-                    var workoutDtos = await _workoutService.GetAllWorkoutsByUserId(user.Id);
+                    var workoutDtos = await _workoutService.GetWorkoutsByUserId(user.Id);
 
                     return new UserCompletoDto
                     {
@@ -96,7 +96,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     throw new Exception("Usuário não encontrado.");
                 }
 
-                var workoutDtos = await _workoutService.GetAllWorkoutsByUserId(userResponse.Id);
+                var workoutDtos = await _workoutService.GetWorkoutsByUserId(userResponse.Id);
 
                 var userCompletoDto = new UserCompletoDto
                 {
@@ -224,7 +224,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 if (userResponse == null)
                     throw new Exception("Usuário não encontrado.");
 
-                var workoutResponse = await _workoutService.GetAllWorkoutsByUserId(userResponse.Id);
+                var workoutResponse = await _workoutService.GetWorkoutsByUserId(userResponse.Id);
 
                 await _supabase.From<Models.User>().Where(x => x.Id == id).Delete();
 

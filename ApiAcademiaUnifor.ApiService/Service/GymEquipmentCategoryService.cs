@@ -23,7 +23,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
 
                 foreach (var w in categorias)
                 {
-                    var equipamentos = await _gymEquipmentService.GetEquipmentByCategoryId(w.Id);
+                    var equipamentos = await _gymEquipmentService.GetByCategoryId(w.Id);
 
                     categoriaDtos.Add(new GymEquipmentCategoryDto
                     {
@@ -52,7 +52,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 if (categoria == null)
                     throw new Exception("Categoria não encontrada");
 
-                var equipamentos = await _gymEquipmentService.GetEquipmentByCategoryId(id);
+                var equipamentos = await _gymEquipmentService.GetByCategoryId(id);
 
 
                 var categoriaCompleta = new GymEquipmentCategoryDto
@@ -120,7 +120,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 if (result == null)
                     throw new Exception("Erro ao inserir a categoria");
 
-                var equipamentos = await _gymEquipmentService.GetEquipmentByCategoryId(id);
+                var equipamentos = await _gymEquipmentService.GetByCategoryId(id);
 
                 var gymCategory = new GymEquipmentCategoryDto
                 {
