@@ -36,6 +36,20 @@ namespace ApiAcademiaUnifor.ApiService.Controller
             }
         }
 
+        [HttpGet("byworkoutid/{workoutId}")]
+        public async Task<IActionResult> GetExercisesByWorkoutId(int workoutId)
+        {
+            try
+            {
+                var retorno = await _exerciseService.GetExercisesByWorkoutId(workoutId);
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ExerciseDto exerciseDto)
         {

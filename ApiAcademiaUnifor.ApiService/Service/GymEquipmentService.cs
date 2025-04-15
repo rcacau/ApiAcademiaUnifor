@@ -80,7 +80,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
         }
 
 
-        public async Task<List<GymEquipmentDto>> GetByCategoryId(int categoryId)
+        public async Task<List<GymEquipmentDto>> GetEquipmentByCategoryId(int categoryId)
         {
             try
             {
@@ -91,7 +91,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
 
                 var equipmentList = queryResult.Models.ToList();
 
-                if (equipmentList == null || !equipmentList.Any())
+                if (equipmentList == null)
                     throw new Exception("Nenhum equipamento encontrado para esta categoria.");
 
                 var equipmentDtoList = equipmentList.Select(equipment => new GymEquipmentDto

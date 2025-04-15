@@ -24,7 +24,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
 
                 foreach (var w in workouts)
                 {
-                    var exercises = await _exerciseService.GetByWorkoutId(w.Id);
+                    var exercises = await _exerciseService.GetExercisesByWorkoutId(w.Id);
 
                     workoutDtos.Add(new WorkoutDto
                     {
@@ -55,7 +55,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
 
                 foreach (var w in workouts)
                 {
-                    var exercises = await _exerciseService.GetByWorkoutId(w.Id);
+                    var exercises = await _exerciseService.GetExercisesByWorkoutId(w.Id);
 
                     workoutDtos.Add(new WorkoutDto
                     {
@@ -87,7 +87,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     throw new Exception($"Workout with ID {id} not found.");
                 }
 
-                var exercises = await _exerciseService.GetByWorkoutId(id);
+                var exercises = await _exerciseService.GetExercisesByWorkoutId(id);
                 var workoutDto = new WorkoutDto
                 {
                     Id = workout.Id,
@@ -165,7 +165,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
 
                 await _supabase.From<Workout>().Where(x => x.Id == id).Delete();
 
-                var exercises = await _exerciseService.GetByWorkoutId(id);
+                var exercises = await _exerciseService.GetExercisesByWorkoutId(id);
 
                 foreach (var exercise in exercises)
                 {

@@ -16,19 +16,19 @@ namespace ApiAcademiaUnifor.ApiService.Service
         {
             try
             {
-                var categoriasResponse = await _supabase.From<Models.GymEquipmentCategory>().Get();
+                var categoriasResponse = await _supabase.From<GymEquipmentCategory>().Get();
                 var categorias = categoriasResponse.Models.ToList();
 
                 var categoriaDtos = new List<GymEquipmentCategoryDto>();
 
                 foreach (var w in categorias)
                 {
-                    var equipamentos = await _gymEquipmentService.GetByCategoryId(w.Id);
+                    var equipamentos = await _gymEquipmentService.GetEquipmentByCategoryId(w.Id);
 
                     categoriaDtos.Add(new GymEquipmentCategoryDto
                     {
                         Id = w.Id,
-                        category_name =w.category_name,
+                        category_name =w.CategoryName,
                         Total = w.Total,
                         Equipments = equipamentos
                     });
@@ -52,13 +52,13 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 if (categoria == null)
                     throw new Exception("Categoria não encontrada");
 
-                var equipamentos = await _gymEquipmentService.GetByCategoryId(id);
+                var equipamentos = await _gymEquipmentService.GetEquipmentByCategoryId(id);
 
 
                 var categoriaCompleta = new GymEquipmentCategoryDto
                 {
                     Id = categoria.Id,
-                    category_name = categoria.category_name,
+                    category_name = categoria.CategoryName,
                     Total = categoria.Total,
                     Equipments = equipamentos
                 };
@@ -77,18 +77,20 @@ namespace ApiAcademiaUnifor.ApiService.Service
             {
                 var lista = await _supabase.From<Models.GymEquipmentCategory>().Get();
 
-                int id = lista.Models.Any() ? lista.Models.Max(e => e.Id) : 0;
+                int nextId = lista.Models.Any() 
+                    ? lista.Models.Max(e => e.Id) + 1 
+                    : 1;
 
                 var gymEquipmentCategory = new GymEquipmentCategory
                 {
-                    Id = id + 1,
-                    category_name = gymEquipmentCategoryDto.category_name,
-                    Total = gymEquipmentCategoryDto.Total
+                    Id = nextId,
+                    CategoryName = gymEquipmentCategoryDto.category_name,
                 };
 
                 await _supabase.From<Models.GymEquipmentCategory>().Insert(gymEquipmentCategory);
 
-                
+                gymEquipmentCategoryDto.Id = gymEquipmentCategory.Id;
+
                 return gymEquipmentCategoryDto;
 
             }
@@ -108,7 +110,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     throw new Exception("Categoria não encontrada");
 
                 
-                categoryResponse.category_name = gymEquipmentCategoryDto.category_name;
+                categoryResponse.CategoryName = gymEquipmentCategoryDto.category_name;
 
 
                 var category = await categoryResponse.Update<GymEquipmentCategory>();
@@ -118,12 +120,12 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 if (result == null)
                     throw new Exception("Erro ao inserir a categoria");
 
-                var equipamentos = await _gymEquipmentService.GetByCategoryId(id);
+                var equipamentos = await _gymEquipmentService.GetEquipmentByCategoryId(id);
 
                 var gymCategory = new GymEquipmentCategoryDto
                 {
                     Id = result.Id,
-                    category_name = result.category_name,
+                    category_name = result.CategoryName,
                     Total = result.Total,
                     Equipments = equipamentos
                 };

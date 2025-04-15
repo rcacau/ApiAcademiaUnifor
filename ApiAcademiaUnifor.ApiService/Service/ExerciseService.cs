@@ -67,8 +67,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
-        //novo; igor, depois vê se precisa essa parte no controller
-        public async Task<List<ExerciseDto>> GetByWorkoutId(int workoutId)
+        public async Task<List<ExerciseDto>> GetExercisesByWorkoutId(int workoutId)
         {
             try
             {
@@ -105,11 +104,13 @@ namespace ApiAcademiaUnifor.ApiService.Service
 
                 var lista = await _supabase.From<Models.Exercise>().Get();
 
-                int id = lista.Models.Any() ? lista.Models.Max(e => e.Id) : 0;
+                int nextId = lista.Models.Any() 
+                    ? lista.Models.Max(e => e.Id) + 1
+                    : 1;
 
                 var exercise = new Models.Exercise
                 {
-                    Id = id + 1,
+                    Id = nextId,
                     Name = exerciseDto.Name,
                     Reps = exerciseDto.Reps,
                     Notes = exerciseDto.Notes,

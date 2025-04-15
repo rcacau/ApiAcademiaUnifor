@@ -29,6 +29,9 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<GymEquipmentService>();
+builder.Services.AddScoped<GymEquipmentCategoryService>();
+builder.Services.AddScoped<ExerciseService>();
+builder.Services.AddScoped<WorkoutService>();
 
 builder.Services.AddSingleton(supabaseClient);
 
