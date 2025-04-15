@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace ApiAcademiaUnifor.ApiService.Models
 {
-    [Table("gym_equipment")]
+    [Table("gym_equipments")]
     public class GymEquipment : BaseModel
     {
         [PrimaryKey("id")]

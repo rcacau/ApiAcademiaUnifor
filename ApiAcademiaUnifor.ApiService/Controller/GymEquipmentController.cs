@@ -36,7 +36,20 @@ namespace ApiAcademiaUnifor.ApiService.Controller
             }
         }
 
-        
+        [HttpGet("bycategoryid/{categoryId}")]
+        public async Task<IActionResult> GetEquipmentByCategoryId(int categoryId)
+        {
+            try
+            {
+                var retorno = await _gymEquipmentService.GetEquipmentByCategoryId(categoryId);
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post(GymEquipmentDto gymEquipmentDto)
         {
