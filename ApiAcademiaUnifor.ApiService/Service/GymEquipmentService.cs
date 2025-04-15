@@ -19,151 +19,162 @@ namespace ApiAcademiaUnifor.ApiService.Service
         {
             try
             {
-                var result = await _supabase
+                var equipmentRecords = await _supabase
                     .From<GymEquipment>()
-                    .Select("*")
                     .Get();
 
-                var dtoList = result.Models.Select(e => new GymEquipmentDto
+                var equipmentDtoList = equipmentRecords.Models.Select(equipment => new GymEquipmentDto
                 {
-                    Id = e.Id,
-                    CategoryId = e.CategoryId,
-                    Name = e.Name,
-                    Brand = e.Brand,
-                    Model = e.Model,
-                    Quantity = e.Quantity,
-                    Image = e.Image,
-                    Operational = e.Operational == false ? false : null
-
+                    Id = equipment.Id,
+                    CategoryId = equipment.CategoryId,
+                    Name = equipment.Name,
+                    Brand = equipment.Brand,
+                    Model = equipment.Model,
+                    Quantity = equipment.Quantity,
+                    Image = equipment.Image,
+                    Operational = equipment.Operational == false ? false : null
                 }).ToList();
 
-                return dtoList;
+                return equipmentDtoList;
             }
             catch (Exception ex)
             {
                 throw new Exception($"Erro ao carregar os equipamentos: {ex.Message}");
             }
         }
+
 
 
         public async Task<GymEquipmentDto> GetById(int id)
         {
             try
             {
-                var result = await _supabase
-                .From<GymEquipment>()
-                .Where(e => e.Id == id)
-                .Get();
+                var queryResult = await _supabase
+                    .From<GymEquipment>()
+                    .Where(equipment => equipment.Id == id)
+                    .Get();
 
-                var equipmentId = result.Models.FirstOrDefault();
+                var equipment = queryResult.Models.FirstOrDefault();
 
-                if (equipmentId == null)
+                if (equipment == null)
                     throw new Exception("Equipamento não encontrado");
 
-                var dtoList = new GymEquipmentDto
+                var equipmentDto = new GymEquipmentDto
                 {
-                    Id = equipmentId.Id,
-                    CategoryId = equipmentId.CategoryId,
-                    Name = equipmentId.Name,
-                    Brand = equipmentId.Brand,
-                    Model = equipmentId.Model,
-                    Quantity = equipmentId.Quantity,
-                    Image = equipmentId.Image,
-                    Operational = equipmentId.Operational == false ? false : null
-
+                    Id = equipment.Id,
+                    CategoryId = equipment.CategoryId,
+                    Name = equipment.Name,
+                    Brand = equipment.Brand,
+                    Model = equipment.Model,
+                    Quantity = equipment.Quantity,
+                    Image = equipment.Image,
+                    Operational = equipment.Operational == false ? false : null
                 };
 
-                return dtoList;
+                return equipmentDto;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Erro ao carregar os equipamentos: {ex.Message}");
+                throw new Exception($"Erro ao carregar o equipamento: {ex.Message}");
             }
-
         }
+
 
         public async Task<List<GymEquipmentDto>> GetByCategoryId(int categoryId)
         {
             try
             {
-                var result = await _supabase
-                .From<GymEquipment>()
-                .Where(e => e.CategoryId == categoryId)
-                .Get();
-                var equipmentResult = result.Models.ToList();
+                var queryResult = await _supabase
+                    .From<GymEquipment>()
+                    .Where(equipment => equipment.CategoryId == categoryId)
+                    .Get();
 
-                if (equipmentResult == null)
-                    throw new Exception("Equipamento não encontrado");
+                var equipmentList = queryResult.Models.ToList();
 
-                return equipmentResult.Select(e => new GymEquipmentDto
+                if (equipmentList == null || !equipmentList.Any())
+                    throw new Exception("Nenhum equipamento encontrado para esta categoria.");
+
+                var equipmentDtoList = equipmentList.Select(equipment => new GymEquipmentDto
                 {
-                    Id = e.Id,
-                    CategoryId = e.CategoryId,
-                    Name = e.Name,
-                    Brand = e.Brand,
-                    Model = e.Model,
-                    Quantity = e.Quantity,
-                    Image = e.Image,
-                    Operational = e.Operational == false ? false : null
+                    Id = equipment.Id,
+                    CategoryId = equipment.CategoryId,
+                    Name = equipment.Name,
+                    Brand = equipment.Brand,
+                    Model = equipment.Model,
+                    Quantity = equipment.Quantity,
+                    Image = equipment.Image,
+                    Operational = equipment.Operational == false ? false : null
                 }).ToList();
+
+                return equipmentDtoList;
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception($"Erro ao carregar equipamentos por categoria: {ex.Message}");
             }
         }
 
-       
 
-        public async Task<GymEquipmentDto> Post(GymEquipmentDto gymEquipmentDto)
+
+
+        public async Task<GymEquipmentDto> Post(GymEquipmentDto newEquipmentDto)
         {
             try
             {
-                var categoriesResponse = await _supabase.From<Models.GymEquipmentCategory>().Get();
-                var category = categoriesResponse.Models.FirstOrDefault(c => c.Id == gymEquipmentDto.CategoryId);
+                var categoryQuery = await _supabase
+                    .From<Models.GymEquipmentCategory>()
+                    .Get();
+
+                var category = categoryQuery.Models.FirstOrDefault(c => c.Id == newEquipmentDto.CategoryId);
 
                 if (category == null)
                     throw new Exception("Categoria informada não existe.");
 
-                var lista = await _supabase.From<Models.GymEquipment>().Get();
+                var existingEquipments = await _supabase
+                    .From<Models.GymEquipment>()
+                    .Get();
 
-                int id = lista.Models.Any() ? lista.Models.Max(e => e.Id) : 0;
+                int nextId = existingEquipments.Models.Any()
+                    ? existingEquipments.Models.Max(e => e.Id) + 1
+                    : 1;
 
-                var gymEquipment = new GymEquipment
+                var newEquipment = new GymEquipment
                 {
-                    Id = id + 1,
-                    CategoryId = gymEquipmentDto.CategoryId,
-                    Name = gymEquipmentDto.Name,
-                    Brand = gymEquipmentDto.Brand,
-                    Model = gymEquipmentDto.Model,
-                    Quantity = gymEquipmentDto.Quantity,
-                    Image = gymEquipmentDto.Image,
-                    Operational = gymEquipmentDto.Operational == false ? false : null
-
-
+                    Id = nextId,
+                    CategoryId = newEquipmentDto.CategoryId,
+                    Name = newEquipmentDto.Name,
+                    Brand = newEquipmentDto.Brand,
+                    Model = newEquipmentDto.Model,
+                    Quantity = newEquipmentDto.Quantity,
+                    Image = newEquipmentDto.Image,
+                    Operational = newEquipmentDto.Operational == false ? false : null
                 };
 
-                var equipmentResponse = await _supabase.From<Models.GymEquipment>().Insert(gymEquipment);
+                var insertResult = await _supabase
+                    .From<Models.GymEquipment>()
+                    .Insert(newEquipment);
 
-                category.Total += gymEquipment.Quantity;
-                await _supabase.From<Models.GymEquipmentCategory>().Update(category);
+                category.Total += newEquipment.Quantity;
 
-                var result = equipmentResponse.Models.FirstOrDefault();
+                await _supabase
+                    .From<Models.GymEquipmentCategory>()
+                    .Update(category);
 
-                if (result == null)
-                    throw new Exception("Não foi possivel inserir o equipamento");
+                var insertedEquipment = insertResult.Models.FirstOrDefault();
+
+                if (insertedEquipment == null)
+                    throw new Exception("Não foi possível inserir o equipamento.");
 
                 return new GymEquipmentDto
                 {
-                    Id = result.Id,
-                    CategoryId = result.CategoryId,
-                    Name = result.Name,
-                    Brand = result.Brand,
-                    Model = result.Model,
-                    Quantity = result.Quantity,
-                    Image = result.Image,
-                    Operational = result.Operational == false ? false : null
-
+                    Id = insertedEquipment.Id,
+                    CategoryId = insertedEquipment.CategoryId,
+                    Name = insertedEquipment.Name,
+                    Brand = insertedEquipment.Brand,
+                    Model = insertedEquipment.Model,
+                    Quantity = insertedEquipment.Quantity,
+                    Image = insertedEquipment.Image,
+                    Operational = insertedEquipment.Operational == false ? false : null
                 };
             }
             catch (Exception ex)
@@ -173,102 +184,115 @@ namespace ApiAcademiaUnifor.ApiService.Service
         }
 
 
-        public async Task<GymEquipmentDto> Put(GymEquipmentDto gymEquipmentDto, int id)
+
+        public async Task<GymEquipmentDto> Put(GymEquipmentDto updatedEquipmentDto, int equipmentId)
         {
             try
             {
-                var equipmentResponse = await _supabase.From<Models.GymEquipment>().Where(c => c.Id==id).Single();
+                var equipmentQuery = await _supabase
+                    .From<Models.GymEquipment>()
+                    .Where(e => e.Id == equipmentId)
+                    .Single();
 
-                if (equipmentResponse == null)
-                    throw new Exception("Equipamento informada não existe.");
+                if (equipmentQuery == null)
+                    throw new Exception("Equipamento informado não existe.");
 
-                var categoriesResponse = await _supabase.From<Models.GymEquipmentCategory>().Get();
-                var category_old = categoriesResponse.Models.FirstOrDefault(c => c.Id == equipmentResponse.CategoryId);
+                var categoryQuery = await _supabase
+                    .From<Models.GymEquipmentCategory>()
+                    .Get();
 
-                if (category_old == null)
-                    throw new Exception("Categoria informada não existe.");
+                var previousCategory = categoryQuery.Models
+                    .FirstOrDefault(c => c.Id == equipmentQuery.CategoryId);
 
+                if (previousCategory == null)
+                    throw new Exception("Categoria anterior não existe.");
 
-                category_old.Total -= equipmentResponse.Quantity;
+                previousCategory.Total -= equipmentQuery.Quantity;
+                await _supabase.From<Models.GymEquipmentCategory>().Update(previousCategory);
 
-                await _supabase.From<Models.GymEquipmentCategory>().Update(category_old);
+                equipmentQuery.CategoryId = updatedEquipmentDto.CategoryId;
+                equipmentQuery.Name = updatedEquipmentDto.Name;
+                equipmentQuery.Brand = updatedEquipmentDto.Brand;
+                equipmentQuery.Model = updatedEquipmentDto.Model;
+                equipmentQuery.Quantity = updatedEquipmentDto.Quantity;
+                equipmentQuery.Image = updatedEquipmentDto.Image;
+                equipmentQuery.Operational = updatedEquipmentDto.Operational == false ? false : null;
 
-                equipmentResponse.CategoryId = gymEquipmentDto.CategoryId;
-                equipmentResponse.Name = gymEquipmentDto.Name;
-                equipmentResponse.Brand = gymEquipmentDto.Brand;
-                equipmentResponse.Model = gymEquipmentDto.Model;
-                equipmentResponse.Quantity = gymEquipmentDto.Quantity;
-                equipmentResponse.Image = gymEquipmentDto.Image;
-                equipmentResponse.Operational = gymEquipmentDto.Operational == false ? false : null;
+                var newCategory = categoryQuery.Models
+                    .FirstOrDefault(c => c.Id == equipmentQuery.CategoryId);
 
+                if (newCategory == null)
+                    throw new Exception("Nova categoria informada não existe.");
 
+                newCategory.Total += equipmentQuery.Quantity;
+                await _supabase.From<Models.GymEquipmentCategory>().Update(newCategory);
 
+                var updateResult = await equipmentQuery.Update<GymEquipment>();
+                var updatedEquipment = updateResult.Models.FirstOrDefault();
 
-                var category_new = categoriesResponse.Models.FirstOrDefault(c => c.Id == equipmentResponse.CategoryId);
-
-                if (category_new == null)
-                    throw new Exception("Categoria informada não existe.");
-
-                category_new.Total += equipmentResponse.Quantity;
-
-                var equipment = await equipmentResponse.Update<GymEquipment>();
-
-                var result = equipment.Models.FirstOrDefault();
-
-                if (result == null)
-                    throw new Exception("Não foi possivel inserir o equipamento");
+                if (updatedEquipment == null)
+                    throw new Exception("Não foi possível atualizar o equipamento.");
 
                 return new GymEquipmentDto
                 {
-                    Id = result.Id,
-                    CategoryId = result.CategoryId,
-                    Name = result.Name,
-                    Brand = result.Brand,
-                    Model = result.Model,
-                    Quantity = result.Quantity,
-                    Image = result.Image,
-                    Operational = result.Operational == false ? false : null
-
+                    Id = updatedEquipment.Id,
+                    CategoryId = updatedEquipment.CategoryId,
+                    Name = updatedEquipment.Name,
+                    Brand = updatedEquipment.Brand,
+                    Model = updatedEquipment.Model,
+                    Quantity = updatedEquipment.Quantity,
+                    Image = updatedEquipment.Image,
+                    Operational = updatedEquipment.Operational == false ? false : null
                 };
             }
             catch (Exception ex)
             {
-                throw new Exception($"Erro ao inserir equipamento: {ex.Message}");
+                throw new Exception($"Erro ao atualizar equipamento: {ex.Message}");
             }
         }
 
 
-        public async Task<GymEquipmentDto> Delete(int id)
+
+
+        public async Task<GymEquipmentDto> Delete(int equipmentId)
         {
             try
             {
-                var equipmentResponse = await _supabase.From<GymEquipment>().Where(x => x.Id == id).Single();
+                var equipment = await _supabase
+                    .From<GymEquipment>()
+                    .Where(e => e.Id == equipmentId)
+                    .Single();
 
-                if (equipmentResponse == null)
-                    throw new Exception("Usuário não encontrado.");
+                if (equipment == null)
+                    throw new Exception("Equipamento não encontrado.");
 
+                var categoryQuery = await _supabase
+                    .From<Models.GymEquipmentCategory>()
+                    .Get();
 
-                var categoriesResponse = await _supabase.From<Models.GymEquipmentCategory>().Get();
-                var category = categoriesResponse.Models.FirstOrDefault(c => c.Id == equipmentResponse.CategoryId);
+                var relatedCategory = categoryQuery.Models
+                    .FirstOrDefault(c => c.Id == equipment.CategoryId);
 
-                if (category == null)
-                    throw new Exception("Categoria informada não existe.");
+                if (relatedCategory == null)
+                    throw new Exception("Categoria relacionada não existe.");
 
-                category.Total -= equipmentResponse.Quantity;
+                relatedCategory.Total -= equipment.Quantity;
+                await _supabase.From<Models.GymEquipmentCategory>().Update(relatedCategory);
 
-                GymEquipmentDto response = await GetById(id);
+                GymEquipmentDto deletedEquipmentDto = await GetById(equipmentId);
 
-                await _supabase.From<GymEquipment>().Where(x => x.Id == id).Delete();
-                
+                await _supabase.From<GymEquipment>()
+                    .Where(e => e.Id == equipmentId)
+                    .Delete();
 
-                return response;
-
+                return deletedEquipmentDto;
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception($"Erro ao excluir equipamento: {ex.Message}");
             }
         }
+
 
 
     }
