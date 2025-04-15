@@ -110,15 +110,19 @@ namespace ApiAcademiaUnifor.ApiService.Service
             try
             {
                 var lista = await _supabase.From<Workout>().Get();
-                int id = lista.Models.Any() ? lista.Models.Max(e => e.Id) : 0;
+
+                int nextId = lista.Models.Any()
+                    ? lista.Models.Max(e => e.Id) + 1
+                    : 1;
                 var workout = new Workout
                 {
-                    Id = id + 1,
+                    Id = nextId,
                     UserId = workoutDto.UserId,
                     Name = workoutDto.Name,
                     Description = workoutDto.Description
                 };
                 await _supabase.From<Workout>().Insert(workout);
+                workoutDto.Id = nextId;
                 return workoutDto;
             }
             catch (Exception ex)
