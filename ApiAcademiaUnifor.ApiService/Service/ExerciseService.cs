@@ -76,9 +76,12 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 .From<Exercise>()
                 .Where(e => e.WorkoutId == workoutId)
                 .Get();
+
                 var exerciseResult = result.Models.ToList();
+
                 if (exerciseResult == null)
                     throw new Exception("Equipamento não encontrado");
+
                 return exerciseResult.Select(e => new ExerciseDto
                 {
                     Id = e.Id,
@@ -99,8 +102,11 @@ namespace ApiAcademiaUnifor.ApiService.Service
             try
             {
                 exerciseDto.Id = 0;
+
                 var lista = await _supabase.From<Models.Exercise>().Get();
+
                 int id = lista.Models.Any() ? lista.Models.Max(e => e.Id) : 0;
+
                 var exercise = new Models.Exercise
                 {
                     Id = id + 1,
@@ -109,7 +115,9 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Notes = exerciseDto.Notes,
                     WorkoutId = exerciseDto.WorkoutId
                 };
+
                 var response = await _supabase.From<Models.Exercise>().Insert(exercise);
+
                 return new ExerciseDto
                 {
                     Id = response.Models.First().Id,
