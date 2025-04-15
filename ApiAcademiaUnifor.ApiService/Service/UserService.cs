@@ -127,11 +127,13 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 userDto.Id = 0; 
 
                 var lista = await _supabase.From<Models.User>().Get();
-                int id = lista.Models.Any() ? lista.Models.Max(e => e.Id) : 0;
+                int nextId = lista.Models.Any()
+                    ? lista.Models.Max(e => e.Id) + 1
+                    : 1; ;
 
                 var user = new Models.User
                 {
-                    Id = id + 1,
+                    Id = nextId,
                     Password = userDto.Password,
                     Name = userDto.Name,
                     Email = userDto.Email,
