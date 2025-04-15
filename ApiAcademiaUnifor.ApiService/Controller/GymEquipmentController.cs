@@ -37,11 +37,11 @@ namespace ApiAcademiaUnifor.ApiService.Controller
         }
 
         [HttpGet("bycategoryid/{categoryId}")]
-        public async Task<IActionResult> GetEquipmentByCategoryId(int categoryId)
+        public async Task<IActionResult> GetByCategoryId(int categoryId)
         {
             try
             {
-                var retorno = await _gymEquipmentService.GetEquipmentByCategoryId(categoryId);
+                var retorno = await _gymEquipmentService.GetByCategoryId(categoryId);
                 return Ok(retorno);
             }
             catch (Exception ex)

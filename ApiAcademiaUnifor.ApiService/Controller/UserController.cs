@@ -19,7 +19,6 @@ namespace ApiAcademiaUnifor.ApiService.Controller
                     return Ok(new { message = "Autenticado com sucesso!" });
 
                 return Unauthorized(new { message = "Falha na autenticação!" });
-
             }
             catch (Exception ex)
             {

@@ -37,11 +37,11 @@ namespace ApiAcademiaUnifor.ApiService.Controller
         }
 
         [HttpGet("byworkoutid/{workoutId}")]
-        public async Task<IActionResult> GetExercisesByWorkoutId(int workoutId)
+        public async Task<IActionResult> GetByWorkoutId(int workoutId)
         {
             try
             {
-                var retorno = await _exerciseService.GetExercisesByWorkoutId(workoutId);
+                var retorno = await _exerciseService.GetByWorkoutId(workoutId);
                 return Ok(retorno);
             }
             catch (Exception ex)

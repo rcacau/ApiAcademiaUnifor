@@ -67,7 +67,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
-        public async Task<List<ExerciseDto>> GetExercisesByWorkoutId(int workoutId)
+        public async Task<List<ExerciseDto>> GetByWorkoutId(int workoutId)
         {
             try
             {

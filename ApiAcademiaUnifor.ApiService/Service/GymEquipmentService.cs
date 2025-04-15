@@ -44,7 +44,6 @@ namespace ApiAcademiaUnifor.ApiService.Service
         }
 
 
-
         public async Task<GymEquipmentDto> GetById(int id)
         {
             try
@@ -80,7 +79,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
         }
 
 
-        public async Task<List<GymEquipmentDto>> GetEquipmentByCategoryId(int categoryId)
+        public async Task<List<GymEquipmentDto>> GetByCategoryId(int categoryId)
         {
             try
             {
@@ -113,8 +112,6 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 throw new Exception($"Erro ao carregar equipamentos por categoria: {ex.Message}");
             }
         }
-
-
 
 
         public async Task<GymEquipmentDto> Post(GymEquipmentDto newEquipmentDto)
