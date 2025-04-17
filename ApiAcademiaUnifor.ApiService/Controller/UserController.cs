@@ -13,12 +13,12 @@ namespace ApiAcademiaUnifor.ApiService.Controller
         {
             try
             {
-                var retorno = await _usersService.authenticate(authenticateDto);
+                var info = await _usersService.authenticate(authenticateDto);
 
-                if (retorno)
-                    return Ok(new { message = "Autenticado com sucesso!" });
+                if (info is null)
+                    return Unauthorized(new { message = "Falha na autenticação!" });
 
-                return Unauthorized(new { message = "Falha na autenticação!" });
+                return Ok(new { message = "Success", info });
             }
             catch (Exception ex)
             {
