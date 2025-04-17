@@ -13,13 +13,22 @@ namespace ApiAcademiaUnifor.ApiService.Service
             _workoutService = new WorkoutService(supabase);
         }
 
-        public async Task<bool> authenticate(AuthenticateDto authenticateDto)
+        public async Task<AuthenticateResponseDto> authenticate(AuthenticateDto authenticateDto)
         {
             var user = await _supabase.From<Models.User>()
                 .Where(x => x.Email == authenticateDto.email && x.Password == authenticateDto.passWord)
                 .Single();
 
-            return user is not null;
+            if(user is null)
+                return null;
+
+            var userResponse = new AuthenticateResponseDto
+            {
+                email = user?.Email,
+                isAdmin = user.IsAdmin == true ? true : false,
+            };
+
+            return userResponse;
         }
 
         public async Task<List<UserDto>> GetAll()
