@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ApiAcademiaUnifor.ApiService\ApiAcademiaUnifor.ApiService.csproj" />
-    <ProjectReference Include="..\ApiAcademiaUnifor.Web\ApiAcademiaUnifor.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>
