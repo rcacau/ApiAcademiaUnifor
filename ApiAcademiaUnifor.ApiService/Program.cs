@@ -1,16 +1,23 @@
 using ApiAcademiaUnifor.ApiService.Service;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
 
-builder.Services.AddControllers(); 
-builder.Services.AddProblemDetails();
-builder.Services.AddOpenApi();
+// Controllers + JSON
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+});
 
+// Swagger direto
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Supabase
 var supabaseUrl = "https://regjvzhfbouqrcgcghim.supabase.co";
-var supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlZ2p2emhmYm91cXJjZ2NnaGltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NTUzMzgsImV4cCI6MjA1OTQzMTMzOH0.Egzl6APxORjNv49UGEVNoHTpE4NF5MrqNbIXdtGBDX0";
+var supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlZ2p2emhmYm91cXJjZ2NnaGltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM4NTUzMzgsImV4cCI6MjA1OTQzMTMzOH0.Egzl6APxORjNv49UGEVNoHTpE4NF5MrqNbIXdtGBDX0"; // (Truncado por segurança)
 
 var supabaseOptions = new Supabase.SupabaseOptions
 {
@@ -20,33 +27,36 @@ var supabaseOptions = new Supabase.SupabaseOptions
 var supabaseClient = new Supabase.Client(supabaseUrl, supabaseKey, supabaseOptions);
 await supabaseClient.InitializeAsync();
 
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-});
+builder.Services.AddSingleton(supabaseClient);
 
-
-
+// Seus serviços
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<GymEquipmentService>();
 builder.Services.AddScoped<GymEquipmentCategoryService>();
 builder.Services.AddScoped<ExerciseService>();
 builder.Services.AddScoped<WorkoutService>();
 
-builder.Services.AddSingleton(supabaseClient);
-
-
 var app = builder.Build();
 
-app.UseExceptionHandler();
+// Configura tratamento de exceção com rota
+app.UseExceptionHandler("/error");
+
+// Endpoint para tratar exceções
+app.Map("/error", (HttpContext httpContext) =>
+{
+    var exceptionHandlerFeature = httpContext.Features.Get<IExceptionHandlerFeature>();
+    var exception = exceptionHandlerFeature?.Error;
+
+    return Results.Problem(title: exception?.Message);
+});
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi(); 
+    // Ativa o Swagger UI
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.MapControllers();
-
-app.MapDefaultEndpoints();
 
 app.Run();
