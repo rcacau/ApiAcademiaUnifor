@@ -41,6 +41,49 @@ namespace ApiAcademiaUnifor.ApiService.Controller
             }
         }
 
+        [HttpGet("complete")]
+        public async Task<IActionResult> GetAllCompleteUsers()
+        {
+            try
+            {
+                var retorno = await _usersService.GetAllCompleteUsers();
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        
+        [HttpGet("complete/students")]
+        public async Task<IActionResult> GetAllCompleteStudents()
+        {
+            try
+            {
+                var retorno = await _usersService.GetAllCompleteStudents();
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        
+
+        [HttpGet("complete/{id}")]
+        public async Task<IActionResult> GetCompleteUserByUserId(int id)
+        {
+            try
+            {
+                var retorno = await _usersService.GetCompleteUserByUserId(id);
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] UserDto userDto)
         {
@@ -75,35 +118,6 @@ namespace ApiAcademiaUnifor.ApiService.Controller
             try
             {
                 var retorno = await _usersService.Delete(id);
-                return Ok(retorno);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpGet("complete")]
-        public async Task<IActionResult> GetAllCompleteUsers()
-        {
-            try
-            {
-                var retorno = await _usersService.GetAllCompleteUsers();
-                return Ok(retorno);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        
-
-        [HttpGet("complete/{id}")]
-        public async Task<IActionResult> GetCompleteUserByUserId(int id)
-        {
-            try
-            {
-                var retorno = await _usersService.GetCompleteUserByUserId(id);
                 return Ok(retorno);
             }
             catch (Exception ex)

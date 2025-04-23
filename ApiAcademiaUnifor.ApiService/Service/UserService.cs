@@ -92,6 +92,41 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 throw new Exception($"Erro ao carregar usuários com treinos: {ex.Message}");
             }
         }
+        
+        public async Task<List<UserCompletoDto>> GetAllCompleteStudents()
+        {
+            try
+            {
+                var usuarios = await _supabase.From<Models.User>().Where(x => x.IsAdmin == null).Get();
+
+                var tasks = usuarios.Models.Select(async user =>
+                {
+                    var workoutDtos = await _workoutService.GetWorkoutsByUserId(user.Id);
+
+                    return new UserCompletoDto
+                    {
+                        Id = user.Id,
+                        Name = user.Name,
+                        Email = user.Email,
+                        Password = user.Password,
+                        Phone = user.Phone,
+                        Address = user.Address,
+                        BirthDate = user.BirthDate,
+                        AvatarUrl = user.AvatarUrl,
+                        IsAdmin = user.IsAdmin == true ? true : null,
+                        Workouts = workoutDtos
+                    };
+                });
+
+                var userDtos = await Task.WhenAll(tasks);
+
+                return userDtos.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao carregar usuários com treinos: {ex.Message}");
+            }
+        }
 
         public async Task<UserCompletoDto> GetCompleteUserByUserId(int id)
         {
