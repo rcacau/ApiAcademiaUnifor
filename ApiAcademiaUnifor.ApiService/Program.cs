@@ -29,6 +29,14 @@ await supabaseClient.InitializeAsync();
 
 builder.Services.AddSingleton(supabaseClient);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
+});
+
 // Seus serviços
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<GymEquipmentService>();
@@ -40,6 +48,8 @@ var app = builder.Build();
 
 // Configura tratamento de exceção com rota
 app.UseExceptionHandler("/error");
+
+app.UseCors("AllowAll");
 
 // Endpoint para tratar exceções
 app.Map("/error", (HttpContext httpContext) =>
