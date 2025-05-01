@@ -21,7 +21,7 @@ namespace ApiAcademiaUnifor.ApiService.Dto
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? Operational { get; set; } = null;
 
-
+        public int QuantityInUse { get; set; }
 
     }
 }

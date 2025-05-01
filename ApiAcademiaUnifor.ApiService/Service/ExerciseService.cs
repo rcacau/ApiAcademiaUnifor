@@ -26,7 +26,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Name = e.Name,
                     Reps = e.Reps,
                     Notes = e.Notes,
-                    WorkoutId = e.WorkoutId
+                    WorkoutId = e.WorkoutId,
+                    EquipmentId = e.EquipmentId
                 }).ToList();
                 return exercises;
             }
@@ -56,7 +57,9 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Name = exerciseResult.Name,
                     Reps = exerciseResult.Reps,
                     Notes = exerciseResult.Notes,
-                    WorkoutId = exerciseResult.WorkoutId
+                    WorkoutId = exerciseResult.WorkoutId,
+                    EquipmentId = exerciseResult.EquipmentId
+
                 };
 
 
@@ -87,7 +90,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Name = e.Name,
                     Reps = e.Reps,
                     Notes = e.Notes,
-                    WorkoutId = e.WorkoutId
+                    WorkoutId = e.WorkoutId,
+                    EquipmentId = e.EquipmentId
                 }).ToList();
             }
             catch (Exception ex)
@@ -114,7 +118,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Name = exerciseDto.Name,
                     Reps = exerciseDto.Reps,
                     Notes = exerciseDto.Notes,
-                    WorkoutId = exerciseDto.WorkoutId
+                    WorkoutId = exerciseDto.WorkoutId,
+                    EquipmentId = exerciseDto.EquipmentId
                 };
 
                 var response = await _supabase.From<Models.Exercise>().Insert(exercise);
@@ -125,7 +130,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Name = response.Models.First().Name,
                     Reps = response.Models.First().Reps,
                     Notes = response.Models.First().Notes,
-                    WorkoutId = response.Models.First().WorkoutId
+                    WorkoutId = response.Models.First().WorkoutId,
+                    EquipmentId = response.Models.First().EquipmentId
                 };
             }
             catch (Exception ex)
@@ -148,6 +154,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 response.Reps = exerciseDto.Reps;
                 response.Notes = exerciseDto.Notes;
                 response.WorkoutId = exerciseDto.WorkoutId;
+                response.EquipmentId = exerciseDto.EquipmentId;
 
                 var exercise = await response.Update<Exercise>();
 
@@ -163,6 +170,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Reps = updatedExercise.Reps,
                     Notes = updatedExercise.Notes,
                     WorkoutId = updatedExercise.WorkoutId,
+                    EquipmentId = updatedExercise.EquipmentId
                 };
             }
             catch (Exception ex)
@@ -189,6 +197,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Reps = response.Reps,
                     Notes = response.Notes,
                     WorkoutId = response.WorkoutId,
+                    EquipmentId = response.EquipmentId
                 };
             }
             catch (Exception ex)
