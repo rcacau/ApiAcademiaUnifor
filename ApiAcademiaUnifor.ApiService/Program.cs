@@ -43,6 +43,7 @@ builder.Services.AddScoped<GymEquipmentService>();
 builder.Services.AddScoped<GymEquipmentCategoryService>();
 builder.Services.AddScoped<ExerciseService>();
 builder.Services.AddScoped<WorkoutService>();
+builder.Services.AddScoped<NotificationService>();
 
 var app = builder.Build();
 

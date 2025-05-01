@@ -21,5 +21,8 @@ namespace ApiAcademiaUnifor.ApiService.Models
 
         [Column("workout_id")]
         public int WorkoutId { get; set; }
+
+        [Column("equipment_id")]
+        public int? EquipmentId { get; set; }
     }
 }

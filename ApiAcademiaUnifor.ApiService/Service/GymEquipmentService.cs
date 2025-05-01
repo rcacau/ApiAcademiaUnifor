@@ -113,6 +113,22 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
+        public async Task<int> GetEquipmentUsageCount(int GymEquipmentId)
+        {
+            try
+            { 
+                //pegar quantidade de equipamentos usados em exercicios by equipmentid
+                var queryResult = await _supabase
+                    .From<Exercise>()
+                    .Where(exercise => exercise.EquipmentId == GymEquipmentId)
+                    .Get();
+                return queryResult.Models.Count;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao carregar equipamentos por categoria: {ex.Message}");
+            }
+        }
 
         public async Task<GymEquipmentDto> Post(GymEquipmentDto newEquipmentDto)
         {
