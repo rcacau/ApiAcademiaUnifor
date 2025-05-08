@@ -26,7 +26,7 @@ namespace ApiAcademiaUnifor.ApiService.Models
         public string? Address { get; set; }
 
         [Column("birthDate")]
-        public string? BirthDate { get; set; }
+        public DateOnly? BirthDate { get; set; }
 
         [Column("avatarUrl")]
         public string? AvatarUrl { get; set; }
