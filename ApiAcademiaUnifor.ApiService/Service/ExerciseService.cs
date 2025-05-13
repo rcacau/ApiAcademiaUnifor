@@ -100,6 +100,29 @@ namespace ApiAcademiaUnifor.ApiService.Service
             }
         }
 
+        public async Task<int> GetUsageCountForEquipment(int equipmentId)
+        {
+            try
+            {
+                var result = await _supabase
+                .From<Exercise>()
+                .Where(e => e.EquipmentId == equipmentId)
+                .Get();
+
+                var exerciseResult = result.Models.ToList();
+
+                if (exerciseResult == null)
+                    throw new Exception("Equipamento não existe ou não é utilizado");
+
+                return exerciseResult.Count;
+                
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<ExerciseDto> Post(ExerciseDto exerciseDto)
         {
             try
