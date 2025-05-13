@@ -50,6 +50,21 @@ namespace ApiAcademiaUnifor.ApiService.Controller
             }
         }
 
+        [HttpGet("count/{equipmentId}")]
+        public async Task<IActionResult> GetUsageCountForEquipment(int equipmentId)
+        {
+            try
+            {
+                var count = await _exerciseService.GetUsageCountForEquipment(equipmentId);
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ExerciseDto exerciseDto)
         {
