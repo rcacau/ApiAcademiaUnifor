@@ -23,17 +23,25 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     .From<GymEquipment>()
                     .Get();
 
-                var equipmentDtoList = equipmentRecords.Models.Select(equipment => new GymEquipmentDto
+                var equipmentDtoList = new List<GymEquipmentDto>();
+
+                foreach (var equipment in equipmentRecords.Models)
                 {
-                    Id = equipment.Id,
-                    CategoryId = equipment.CategoryId,
-                    Name = equipment.Name,
-                    Brand = equipment.Brand,
-                    Model = equipment.Model,
-                    Quantity = equipment.Quantity,
-                    Image = equipment.Image,
-                    Operational = equipment.Operational == false ? false : null
-                }).ToList();
+                    var quantityInUse = await GetEquipmentUsageCount(equipment.Id); // Await the Task<int> here
+
+                    equipmentDtoList.Add(new GymEquipmentDto
+                    {
+                        Id = equipment.Id,
+                        CategoryId = equipment.CategoryId,
+                        Name = equipment.Name,
+                        Brand = equipment.Brand,
+                        Model = equipment.Model,
+                        Quantity = equipment.Quantity,
+                        Image = equipment.Image,
+                        Operational = equipment.Operational == false ? false : null,
+                        QuantityInUse = quantityInUse // Assign the awaited result
+                    });
+                }
 
                 return equipmentDtoList;
             }
@@ -58,6 +66,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 if (equipment == null)
                     throw new Exception("Equipamento não encontrado");
 
+                var quantityInUse = await GetEquipmentUsageCount(equipment.Id); // Await the Task<int> here
+
                 var equipmentDto = new GymEquipmentDto
                 {
                     Id = equipment.Id,
@@ -67,7 +77,9 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     Model = equipment.Model,
                     Quantity = equipment.Quantity,
                     Image = equipment.Image,
-                    Operational = equipment.Operational == false ? false : null
+                    Operational = equipment.Operational == false ? false : null,
+                    QuantityInUse = quantityInUse // Assign the awaited result
+
                 };
 
                 return equipmentDto;
@@ -93,17 +105,25 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 if (equipmentList == null)
                     throw new Exception("Nenhum equipamento encontrado para esta categoria.");
 
-                var equipmentDtoList = equipmentList.Select(equipment => new GymEquipmentDto
+                var equipmentDtoList = new List<GymEquipmentDto>();
+
+                foreach (var equipment in equipmentList)
                 {
-                    Id = equipment.Id,
-                    CategoryId = equipment.CategoryId,
-                    Name = equipment.Name,
-                    Brand = equipment.Brand,
-                    Model = equipment.Model,
-                    Quantity = equipment.Quantity,
-                    Image = equipment.Image,
-                    Operational = equipment.Operational == false ? false : null
-                }).ToList();
+                    var quantityInUse = await GetEquipmentUsageCount(equipment.Id); // Await the Task<int> here
+
+                    equipmentDtoList.Add(new GymEquipmentDto
+                    {
+                        Id = equipment.Id,
+                        CategoryId = equipment.CategoryId,
+                        Name = equipment.Name,
+                        Brand = equipment.Brand,
+                        Model = equipment.Model,
+                        Quantity = equipment.Quantity,
+                        Image = equipment.Image,
+                        Operational = equipment.Operational == false ? false : null,
+                        QuantityInUse = quantityInUse // Assign the awaited result
+                    });
+                }
 
                 return equipmentDtoList;
             }
