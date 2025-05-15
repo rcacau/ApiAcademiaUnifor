@@ -23,25 +23,27 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     .From<GymEquipment>()
                     .Get();
 
-                var equipmentDtoList = new List<GymEquipmentDto>();
+                var allExercises = await _supabase
+                    .From<Exercise>()
+                    .Get();
 
-                foreach (var equipment in equipmentRecords.Models)
+                var usageMap = allExercises.Models
+                    .Where(e => e.EquipmentId is int) // só permite se EquipmentId tiver valor
+                    .GroupBy(e => e.EquipmentId!.Value) // garante que o .Value não será nulo
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                var equipmentDtoList = equipmentRecords.Models.Select(equipment => new GymEquipmentDto
                 {
-                    var quantityInUse = await GetEquipmentUsageCount(equipment.Id); // Await the Task<int> here
-
-                    equipmentDtoList.Add(new GymEquipmentDto
-                    {
-                        Id = equipment.Id,
-                        CategoryId = equipment.CategoryId,
-                        Name = equipment.Name,
-                        Brand = equipment.Brand,
-                        Model = equipment.Model,
-                        Quantity = equipment.Quantity,
-                        Image = equipment.Image,
-                        Operational = equipment.Operational == false ? false : null,
-                        QuantityInUse = quantityInUse // Assign the awaited result
-                    });
-                }
+                    Id = equipment.Id,
+                    CategoryId = equipment.CategoryId,
+                    Name = equipment.Name,
+                    Brand = equipment.Brand,
+                    Model = equipment.Model,
+                    Quantity = equipment.Quantity,
+                    Image = equipment.Image,
+                    Operational = equipment.Operational == false ? false : null,
+                    QuantityInUse = usageMap.ContainsKey(equipment.Id) ? usageMap[equipment.Id] : 0
+                }).ToList();
 
                 return equipmentDtoList;
             }
@@ -50,6 +52,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 throw new Exception($"Erro ao carregar os equipamentos: {ex.Message}");
             }
         }
+
 
 
         public async Task<GymEquipmentDto> GetById(int id)
@@ -95,43 +98,41 @@ namespace ApiAcademiaUnifor.ApiService.Service
         {
             try
             {
-                var queryResult = await _supabase
+                var equipmentRecords = await _supabase
                     .From<GymEquipment>()
-                    .Where(equipment => equipment.CategoryId == categoryId)
+                    .Where(x => x.CategoryId == categoryId)
                     .Get();
 
-                var equipmentList = queryResult.Models.ToList();
+                var allExercises = await _supabase
+                    .From<Exercise>()
+                    .Get();
 
-                if (equipmentList == null)
-                    throw new Exception("Nenhum equipamento encontrado para esta categoria.");
+                var usageMap = allExercises.Models
+                    .Where(e => e.EquipmentId is int) // só permite se EquipmentId tiver valor
+                    .GroupBy(e => e.EquipmentId!.Value) // garante que o .Value não será nulo
+                    .ToDictionary(g => g.Key, g => g.Count());
 
-                var equipmentDtoList = new List<GymEquipmentDto>();
-
-                foreach (var equipment in equipmentList)
+                var equipmentDtoList = equipmentRecords.Models.Select(equipment => new GymEquipmentDto
                 {
-                    var quantityInUse = await GetEquipmentUsageCount(equipment.Id); // Await the Task<int> here
-
-                    equipmentDtoList.Add(new GymEquipmentDto
-                    {
-                        Id = equipment.Id,
-                        CategoryId = equipment.CategoryId,
-                        Name = equipment.Name,
-                        Brand = equipment.Brand,
-                        Model = equipment.Model,
-                        Quantity = equipment.Quantity,
-                        Image = equipment.Image,
-                        Operational = equipment.Operational == false ? false : null,
-                        QuantityInUse = quantityInUse // Assign the awaited result
-                    });
-                }
+                    Id = equipment.Id,
+                    CategoryId = equipment.CategoryId,
+                    Name = equipment.Name,
+                    Brand = equipment.Brand,
+                    Model = equipment.Model,
+                    Quantity = equipment.Quantity,
+                    Image = equipment.Image,
+                    Operational = equipment.Operational == false ? false : null,
+                    QuantityInUse = usageMap.ContainsKey(equipment.Id) ? usageMap[equipment.Id] : 0
+                }).ToList();
 
                 return equipmentDtoList;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Erro ao carregar equipamentos por categoria: {ex.Message}");
+                throw new Exception($"Erro ao carregar os equipamentos: {ex.Message}");
             }
         }
+
 
         public async Task<int> GetEquipmentUsageCount(int GymEquipmentId)
         {
