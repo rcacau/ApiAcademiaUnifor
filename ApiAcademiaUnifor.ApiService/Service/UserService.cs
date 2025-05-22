@@ -173,7 +173,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 var lista = await _supabase.From<Models.User>().Get();
                 int nextId = lista.Models.Any()
                     ? lista.Models.Max(e => e.Id) + 1
-                    : 1; ;
+                    : 1;
 
                 var user = new Models.User
                 {
