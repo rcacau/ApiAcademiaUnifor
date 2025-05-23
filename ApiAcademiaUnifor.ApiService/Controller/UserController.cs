@@ -26,6 +26,19 @@ namespace ApiAcademiaUnifor.ApiService.Controller
             }
         }
 
+        [HttpPost("isemailregistered")]
+        public async Task<IActionResult> IsEmailRegistered([FromBody] EmailRequest emailRequest)
+        {
+            try
+            {
+                var retorno = await _usersService.IsEmailRegistered(emailRequest.Email);
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
