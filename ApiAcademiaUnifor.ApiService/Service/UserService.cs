@@ -31,6 +31,25 @@ namespace ApiAcademiaUnifor.ApiService.Service
             return userResponse;
         }
 
+        public async Task<bool> IsEmailRegistered(string? email)
+        {
+            try
+            {
+                var result = await _supabase
+                    .From<User>()
+                    .Filter("email", Supabase.Postgrest.Constants.Operator.Equals, email)
+                    .Limit(1)
+                    .Get();
+
+                return result.Models.Count > 0;
+            }
+            catch (Exception ex)
+            {
+                return false;
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<List<UserDto>> GetAll()
         {
             try
@@ -173,7 +192,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 var lista = await _supabase.From<Models.User>().Get();
                 int nextId = lista.Models.Any()
                     ? lista.Models.Max(e => e.Id) + 1
-                    : 1; ;
+                    : 1;
 
                 var user = new Models.User
                 {
