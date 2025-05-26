@@ -44,6 +44,8 @@ builder.Services.AddScoped<GymEquipmentCategoryService>();
 builder.Services.AddScoped<ExerciseService>();
 builder.Services.AddScoped<WorkoutService>();
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<ClassService>();
+
 
 var app = builder.Build();
 
