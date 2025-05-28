@@ -10,6 +10,80 @@ namespace ApiAcademiaUnifor.ApiService.Service
         {
         }
 
+        public async Task<ClassDto> SubscribeUser(int classId, int userId)
+        {
+            try
+            {
+                var classResponse = await _supabase.From<Classes>().Where(x => x.Id == classId).Get();
+
+                var classModel = classResponse.Models.FirstOrDefault();
+
+                if (classModel == null)
+                    throw new Exception("Aula não encontrada.");
+
+                if (!classModel.ClassListUsers.Contains(userId))
+                {
+                    classModel.ClassListUsers.Add(userId);
+
+                    await _supabase.From<Classes>().Where(x => x.Id == classId).Update(classModel);
+                }
+
+                return new ClassDto
+                {
+                    Id = classModel.Id,
+                    ClassName = classModel.ClassName,
+                    ClassType = classModel.ClassType,
+                    ClassDate = classModel.ClassDate,
+                    ClassTime = classModel.ClassTime,
+                    ClassDuration = classModel.ClassDuration,
+                    ClassCapacity = classModel.ClassCapacity,
+                    TeacherId = classModel.TeacherId,
+                    UserIds = classModel.ClassListUsers
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        
+        public async Task<ClassDto> UnsubscribeUser(int classId, int userId)
+        {
+            try
+            {
+                var classResponse = await _supabase.From<Classes>().Where(x => x.Id == classId).Get();
+
+                var classModel = classResponse.Models.FirstOrDefault();
+
+                if (classModel == null)
+                    throw new Exception("Aula não encontrada.");
+
+                if (classModel.ClassListUsers.Contains(userId))
+                {
+                    classModel.ClassListUsers.Remove(userId);
+
+                    await _supabase.From<Classes>().Where(x => x.Id == classId).Update(classModel);
+                }
+
+                return new ClassDto
+                {
+                    Id = classModel.Id,
+                    ClassName = classModel.ClassName,
+                    ClassType = classModel.ClassType,
+                    ClassDate = classModel.ClassDate,
+                    ClassTime = classModel.ClassTime,
+                    ClassDuration = classModel.ClassDuration,
+                    ClassCapacity = classModel.ClassCapacity,
+                    TeacherId = classModel.TeacherId,
+                    UserIds = classModel.ClassListUsers
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<List<ClassDto>> GetAll()
         {
             try
