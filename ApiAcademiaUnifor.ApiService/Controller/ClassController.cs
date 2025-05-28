@@ -8,6 +8,34 @@ namespace ApiAcademiaUnifor.ApiService.Controller
     [Route("api/[controller]")]
     public class ClassController(ClassService _classService) : ControllerBase
     {
+        [HttpPost("subscribe")]
+        public async Task<IActionResult> SubscribeUser([FromBody] SubscribeRequest subscribeRequest)
+        {
+            try
+            {
+                var retorno = await _classService.SubscribeUser(subscribeRequest.ClassId, subscribeRequest.UserId);
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+        
+        [HttpPost("unsubscribe")]
+        public async Task<IActionResult> UnsubscribeUser([FromBody] SubscribeRequest subscribeRequest)
+        {
+            try
+            {
+                var retorno = await _classService.UnsubscribeUser(subscribeRequest.ClassId, subscribeRequest.UserId);
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
