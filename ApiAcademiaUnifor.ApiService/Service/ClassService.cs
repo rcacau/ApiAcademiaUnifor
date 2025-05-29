@@ -15,7 +15,6 @@ namespace ApiAcademiaUnifor.ApiService.Service
             try
             {
                 var classResponse = await _supabase.From<Classes>().Where(x => x.Id == classId).Get();
-
                 var classModel = classResponse.Models.FirstOrDefault();
 
                 if (classModel == null)
@@ -24,7 +23,6 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 if (!classModel.ClassListUsers.Contains(userId))
                 {
                     classModel.ClassListUsers.Add(userId);
-
                     await _supabase.From<Classes>().Where(x => x.Id == classId).Update(classModel);
                 }
 
@@ -38,7 +36,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     ClassDuration = classModel.ClassDuration,
                     ClassCapacity = classModel.ClassCapacity,
                     TeacherId = classModel.TeacherId,
-                    UserIds = classModel.ClassListUsers
+                    UserIds = classModel.ClassListUsers,
+                    ClassCompleted = classModel.ClassCompleted
                 };
             }
             catch (Exception ex)
@@ -46,13 +45,12 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 throw new Exception(ex.Message);
             }
         }
-        
+
         public async Task<ClassDto> UnsubscribeUser(int classId, int userId)
         {
             try
             {
                 var classResponse = await _supabase.From<Classes>().Where(x => x.Id == classId).Get();
-
                 var classModel = classResponse.Models.FirstOrDefault();
 
                 if (classModel == null)
@@ -61,7 +59,6 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 if (classModel.ClassListUsers.Contains(userId))
                 {
                     classModel.ClassListUsers.Remove(userId);
-
                     await _supabase.From<Classes>().Where(x => x.Id == classId).Update(classModel);
                 }
 
@@ -75,7 +72,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     ClassDuration = classModel.ClassDuration,
                     ClassCapacity = classModel.ClassCapacity,
                     TeacherId = classModel.TeacherId,
-                    UserIds = classModel.ClassListUsers
+                    UserIds = classModel.ClassListUsers,
+                    ClassCompleted = classModel.ClassCompleted
                 };
             }
             catch (Exception ex)
@@ -100,7 +98,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     ClassDuration = c.ClassDuration,
                     ClassCapacity = c.ClassCapacity,
                     TeacherId = c.TeacherId,
-                    UserIds = c.ClassListUsers
+                    UserIds = c.ClassListUsers,
+                    ClassCompleted = c.ClassCompleted
                 }).ToList();
 
                 return classes;
@@ -110,6 +109,66 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<List<ClassDto>> GetIncompleteClasses()
+        {
+            try
+            {
+                var classesResponse = await _supabase.From<Classes>()
+                    .Where(x => x.ClassCompleted == false)
+                    .Get();
+
+                var now = DateTime.Now;
+
+                var updatedClasses = new List<ClassDto>();
+
+                foreach (var c in classesResponse.Models)
+                {
+                    if (!DateTime.TryParse($"{c.ClassDate} {c.ClassTime}", out var startDateTime))
+                        continue;
+
+                    var durationParts = c.ClassDuration.Split(':');
+                    var durationHours = int.Parse(durationParts[0]);
+                    var durationMinutes = int.Parse(durationParts[1]);
+                    var duration = new TimeSpan(durationHours, durationMinutes, 0);
+
+                    var endDateTime = startDateTime.Add(duration);
+
+                    if (now > endDateTime)
+                    {
+                        c.ClassCompleted = true;
+
+                        await _supabase.From<Classes>()
+                            .Where(x => x.Id == c.Id)
+                            .Set(x => x.ClassCompleted, true)
+                            .Update();
+
+                        continue; 
+                    }
+
+                    updatedClasses.Add(new ClassDto
+                    {
+                        Id = c.Id,
+                        ClassName = c.ClassName,
+                        ClassType = c.ClassType,
+                        ClassDate = c.ClassDate,
+                        ClassTime = c.ClassTime,
+                        ClassDuration = c.ClassDuration,
+                        ClassCapacity = c.ClassCapacity,
+                        TeacherId = c.TeacherId,
+                        UserIds = c.ClassListUsers,
+                        ClassCompleted = c.ClassCompleted
+                    });
+                }
+
+                return updatedClasses;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
 
         public async Task<ClassDto> GetById(int id)
         {
@@ -132,7 +191,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     ClassDuration = classResponse.ClassDuration,
                     ClassCapacity = classResponse.ClassCapacity,
                     TeacherId = classResponse.TeacherId,
-                    UserIds = classResponse.ClassListUsers
+                    UserIds = classResponse.ClassListUsers,
+                    ClassCompleted = classResponse.ClassCompleted
                 };
             }
             catch (Exception ex)
@@ -162,11 +222,11 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     ClassDuration = classDto.ClassDuration,
                     ClassCapacity = classDto.ClassCapacity,
                     TeacherId = classDto.TeacherId,
-                    ClassListUsers = classDto.UserIds ?? new List<int>()
+                    ClassListUsers = classDto.UserIds ?? new List<int>(),
+                    ClassCompleted = classDto.ClassCompleted
                 };
 
                 var classResponse = await _supabase.From<Classes>().Insert(newClass);
-
                 var insertedClass = classResponse.Models.FirstOrDefault();
 
                 if (insertedClass == null)
@@ -182,7 +242,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     ClassDuration = insertedClass.ClassDuration,
                     ClassCapacity = insertedClass.ClassCapacity,
                     TeacherId = insertedClass.TeacherId,
-                    UserIds = insertedClass.ClassListUsers
+                    UserIds = insertedClass.ClassListUsers,
+                    ClassCompleted = insertedClass.ClassCompleted
                 };
             }
             catch (Exception ex)
@@ -208,9 +269,9 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 classResponse.ClassCapacity = classDto.ClassCapacity;
                 classResponse.TeacherId = classDto.TeacherId;
                 classResponse.ClassListUsers = classDto.UserIds ?? new List<int>();
+                classResponse.ClassCompleted = classDto.ClassCompleted;
 
                 var updatedClass = await classResponse.Update<Classes>();
-
                 var result = updatedClass.Models.FirstOrDefault();
 
                 if (result == null)
@@ -226,7 +287,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     ClassDuration = result.ClassDuration,
                     ClassCapacity = result.ClassCapacity,
                     TeacherId = result.TeacherId,
-                    UserIds = result.ClassListUsers // Retorna os IDs atualizados
+                    UserIds = result.ClassListUsers,
+                    ClassCompleted = result.ClassCompleted
                 };
             }
             catch (Exception ex)
@@ -256,7 +318,8 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     ClassDuration = classResponse.ClassDuration,
                     ClassCapacity = classResponse.ClassCapacity,
                     TeacherId = classResponse.TeacherId,
-                    UserIds = classResponse.ClassListUsers // Retorna os IDs dos usuários
+                    UserIds = classResponse.ClassListUsers,
+                    ClassCompleted = classResponse.ClassCompleted
                 };
             }
             catch (Exception ex)

@@ -11,5 +11,6 @@
         public string ClassType { get; set; } = string.Empty;
         public int TeacherId {get; set;}
         public List<int>? UserIds { get; set; }
+        public bool ClassCompleted { get; set; }
     }
 }

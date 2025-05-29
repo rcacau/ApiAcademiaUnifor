@@ -50,6 +50,19 @@ namespace ApiAcademiaUnifor.ApiService.Controller
             }
         }
 
+        [HttpGet("imcomplete")]
+        public async Task<IActionResult> GetIGetIncompleteClasses()
+        {
+            try
+            {
+                var retorno = await _classService.GetIncompleteClasses();
+                return Ok(retorno);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
