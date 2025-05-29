@@ -34,5 +34,8 @@ namespace ApiAcademiaUnifor.ApiService.Models
         [Column("class_list_users_id")]
         public List<int> ClassListUsers { get; set; } = new List<int>();
 
+        [Column("class_completed")]
+        public bool ClassCompleted { get; set; }
+
     }
 }
