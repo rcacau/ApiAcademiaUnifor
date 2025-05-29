@@ -50,7 +50,7 @@ namespace ApiAcademiaUnifor.ApiService.Controller
             }
         }
 
-        [HttpGet("imcomplete")]
+        [HttpGet("incomplete")]
         public async Task<IActionResult> GetIGetIncompleteClasses()
         {
             try
