@@ -223,7 +223,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                     ClassCapacity = classDto.ClassCapacity,
                     TeacherId = classDto.TeacherId,
                     ClassListUsers = classDto.UserIds ?? new List<int>(),
-                    ClassCompleted = classDto.ClassCompleted
+                    ClassCompleted = false
                 };
 
                 var classResponse = await _supabase.From<Classes>().Insert(newClass);
@@ -269,7 +269,7 @@ namespace ApiAcademiaUnifor.ApiService.Service
                 classResponse.ClassCapacity = classDto.ClassCapacity;
                 classResponse.TeacherId = classDto.TeacherId;
                 classResponse.ClassListUsers = classDto.UserIds ?? new List<int>();
-                classResponse.ClassCompleted = classDto.ClassCompleted;
+                classResponse.ClassCompleted = false;
 
                 var updatedClass = await classResponse.Update<Classes>();
                 var result = updatedClass.Models.FirstOrDefault();
